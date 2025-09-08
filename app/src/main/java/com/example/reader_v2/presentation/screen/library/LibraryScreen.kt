@@ -11,11 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryScreen(
-
+	libViewModel: LibraryViewModel = hiltViewModel()
 ) {
 	val scope = rememberCoroutineScope()
 	val filePickerScreenLauncher = rememberLauncherForActivityResult(
@@ -23,7 +24,7 @@ fun LibraryScreen(
 		onResult = { uri ->
 			uri?.let {
 				scope.launch {
-
+					libViewModel.addBook(it)
 				}
 			}
 		}
@@ -36,7 +37,9 @@ fun LibraryScreen(
 		innerPadding ->
 		Box(modifier = Modifier.padding(innerPadding)) {
 			Button(
-				onClick = { filePickerScreenLauncher.launch(arrayOf("application/epub+zip")) }
+				onClick = {
+					filePickerScreenLauncher.launch(arrayOf("application/epub+zip"))
+				}
 			) {
 				Text(text = "Select Epub File")
 			}

@@ -1,4 +1,7 @@
 package com.example.reader_v2
 
-class MainApplication {
-}
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class MainApplication : Application() { }
