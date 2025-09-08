@@ -2,8 +2,9 @@ plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.kotlin.compose)
+	alias(libs.plugins.ksp)
+	alias(libs.plugins.hilt.android)
 }
-
 
 android {
 	namespace = "com.example.reader_v2"
@@ -18,7 +19,6 @@ android {
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
-
 	buildTypes {
 		release {
 			isMinifyEnabled = false
@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-
+	// Default libs
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.androidx.activity.compose)
@@ -50,11 +50,31 @@ dependencies {
 	implementation(libs.androidx.ui.graphics)
 	implementation(libs.androidx.ui.tooling.preview)
 	implementation(libs.androidx.material3)
+
+	// Room Database
+	implementation(libs.androidx.room.runtime)
+	implementation(libs.androidx.room.ktx)
+	ksp(libs.androidx.room.compiler)
+
+	// DI - Hilt
+	implementation(libs.hilt)
+	ksp(libs.hilt.compiler)
+
+	// Compose Navigation
+	implementation(libs.androidx.navigation.compose)
+
+	// Ksoup
+	implementation(libs.ksoup)
+
+	// Gson
+	implementation(libs.gson)
+
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
 	androidTestImplementation(platform(libs.androidx.compose.bom))
 	androidTestImplementation(libs.androidx.ui.test.junit4)
+
 	debugImplementation(libs.androidx.ui.tooling)
 	debugImplementation(libs.androidx.ui.test.manifest)
 }
