@@ -1,6 +1,7 @@
-package com.example.reader_v2.domain.epub_parser.helpers
+package com.example.reader_v2.epub_parser.helpers
 
-import com.example.reader_v2.domain.epub_parser.model.EpubFile
+import com.example.reader_v2.epub_parser.model.EpubFile
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -8,7 +9,7 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 @Singleton
-class ZippedFilesReader {
+class ZippedFilesReader @Inject constructor() {
 	suspend fun getZippedFiles(inputStream: InputStream): Map<String, EpubFile> = withContext(Dispatchers.IO) {
 		inputStream.use { stream ->
 			stream.buffered().let {
