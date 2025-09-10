@@ -14,11 +14,10 @@ import java.io.File
 @Singleton
 class TocParser @Inject constructor() {
 	suspend fun parse(tocFile: EpubFile, hrefRootPath: File): List<TocEntry> {
-		val rootPath = hrefRootPath.path
-
 		return withContext(Dispatchers.Default) {
-			val tocDoc: Document = Ksoup.parseXml(tocFile.data.decodeToString())
+			val rootPath = hrefRootPath.path
 
+			val tocDoc: Document = Ksoup.parseXml(tocFile.data.decodeToString())
 			val tocNavMap: Element = tocDoc.selectFirst("nav")?.firstOrNull() {
 				it.attr("epub:type") == "toc"
 			} ?: throw NoSuchElementException("Toc element not found")

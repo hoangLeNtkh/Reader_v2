@@ -7,7 +7,6 @@ import jakarta.inject.Inject
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor() : ViewModel() {
-
 	fun addBook(uri: Uri) {
 
 	}

@@ -11,5 +11,5 @@ data class BookEntity(
 	val title: String,
 	val author: String?,
 	val description: String?,
-	val totalChapters: Int,
+	val totalChapters: Int
 )
