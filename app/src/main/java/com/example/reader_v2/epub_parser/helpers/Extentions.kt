@@ -12,5 +12,7 @@ fun String.findHrefFullPath(hrefRootPath: File): String {
 	return resolvedFile.path.removePrefix("/")
 }
 
+fun String.asFileName(): String = replace(Regex("[^a-zA-Z0-9.-]"), "_")
+
 val String.decodedUrl: String
 	get() = URLDecoder.decode(this, "UTF-8")

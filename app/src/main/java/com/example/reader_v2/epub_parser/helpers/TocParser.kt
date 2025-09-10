@@ -1,7 +1,7 @@
 package com.example.reader_v2.epub_parser.helpers
 
+import com.example.reader_v2.epub_parser.model.EpubBook
 import com.example.reader_v2.epub_parser.model.EpubFile
-import com.example.reader_v2.epub_parser.model.TocEntry
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
@@ -13,8 +13,8 @@ import java.io.File
 
 @Singleton
 class TocParser @Inject constructor() {
-	suspend fun parse(tocFile: EpubFile, hrefRootPath: File): List<TocEntry> {
-		return withContext(Dispatchers.Default) {
+	suspend fun parse(tocFile: EpubFile, hrefRootPath: File): List<EpubBook.TocEntry> =
+		withContext(Dispatchers.Default) {
 			val rootPath = hrefRootPath.path
 
 			val tocDoc: Document = Ksoup.parseXml(tocFile.data.decodeToString())
@@ -29,9 +29,8 @@ class TocParser @Inject constructor() {
 				parseRecursively(liElement, rootPath)
 			}
 		}
-	}
 
-	private fun parseRecursively(liElement: Element, rootPath: String): TocEntry? {
+	private fun parseRecursively(liElement: Element, rootPath: String): EpubBook.TocEntry? {
 		val contentElement: Element? = liElement.selectFirst("a, span")
 
 		val title = contentElement?.ownText()?.trim() ?: ""
@@ -48,9 +47,16 @@ class TocParser @Inject constructor() {
 		} ?: emptyList()
 
 		if (href.isNotEmpty() || children.isNotEmpty()) {
-			val fullHref = if (href.isNotEmpty() && !href.startsWith(rootPath)) "$rootPath/$href" else href
-			return TocEntry(chapterTitle = title, chapterLink = fullHref, children = children)
+			val fullHref =
+				if (href.isNotEmpty() && !href.startsWith(rootPath)) "$rootPath/$href" else href
+			return EpubBook.TocEntry(
+				chapterTitle = title,
+				chapterLink = fullHref,
+				children = children
+			)
 		}
 		return null
 	}
 }
+
+
