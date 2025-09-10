@@ -1,8 +1,6 @@
 package com.example.reader_v2.epub_parser.helpers
 
-import com.example.reader_v2.epub_parser.model.Chapter
-import com.example.reader_v2.epub_parser.model.ManifestItem
-import com.example.reader_v2.epub_parser.model.TocEntry
+import com.example.reader_v2.epub_parser.model.EpubBook
 import com.fleeksoft.ksoup.nodes.Element
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -14,64 +12,61 @@ import java.io.File
 class ChapterParser @Inject constructor() {
 	suspend fun parse(
 		hrefRootPath: File,
-		manifestItems: Map<String, ManifestItem>,
-		tocEntries: List<TocEntry>,
+		manifestItems: Map<String, EpubBook.ManifestItem>,
+		tocEntries: List<EpubBook.TocEntry>,
 		spine: Element
-	) {
-		return withContext(Dispatchers.Default) {
-			val chapters = mutableListOf<Chapter>()
+	): List<EpubBook.Chapter> = withContext(Dispatchers.Default) {
+		val chapters = mutableListOf<EpubBook.Chapter>()
 
-			spine.children().forEach { itemRefElement ->
-				val itemIdRef: String = itemRefElement.attr("idref")
-				val manifestItem: ManifestItem? = manifestItems[itemIdRef]
-				val rootPath: String = hrefRootPath.path
+		spine.children().forEach { itemRefElement ->
+			val itemIdRef: String = itemRefElement.attr("idref")
+			val manifestItem: EpubBook.ManifestItem? = manifestItems[itemIdRef]
+			val rootPath: String = hrefRootPath.path
 
-				if (manifestItem != null && isChapter(manifestItem)) {
-					var manifestItemFullHref: String = manifestItem.hrefFullPath
+			if (manifestItem != null && isChapter(manifestItem)) {
+				var manifestItemFullHref: String = manifestItem.hrefFullPath
 
-					if (!manifestItemFullHref.startsWith(rootPath)) {
-						manifestItemFullHref = "$rootPath/$manifestItemFullHref"
-					}
-
-					val tocEntry: TocEntry? =
-						findTocEntryForChapter(tocEntries, manifestItemFullHref)
-					chapters.add(
-						Chapter(
-							title = tocEntry?.chapterTitle ?: "Chapter ${chapters.size + 1}",
-							fragmentLink = tocEntry?.chapterLink ?: manifestItemFullHref,
-							filePath = manifestItemFullHref
-						)
-					)
+				if (!manifestItemFullHref.startsWith(rootPath)) {
+					manifestItemFullHref = "$rootPath/$manifestItemFullHref"
 				}
+
+				val tocEntry: EpubBook.TocEntry? = findTocEntryForChapter(tocEntries, manifestItemFullHref)
+				chapters.add(
+					EpubBook.Chapter(
+						title = tocEntry?.chapterTitle ?: "Chapter ${chapters.size + 1}",
+						fragmentLink = tocEntry?.chapterLink ?: manifestItemFullHref,
+						filePath = manifestItemFullHref
+					)
+				)
 			}
 		}
+		chapters
 	}
 
-	private fun isChapter(item: ManifestItem): Boolean {
+	private fun isChapter(item: EpubBook.ManifestItem): Boolean {
 		val extension = item.hrefFullPath.substringAfterLast('.').lowercase()
 		return extension in listOf("xhtml", "xml", "html", "htm")
 	}
 
 	private fun findTocEntryForChapter(
-		tocEntries: List<TocEntry>,
+		tocEntries: List<EpubBook.TocEntry>,
 		chapterHref: String
-	): TocEntry? {
+	): EpubBook.TocEntry? {
 		val chapterHrefWithoutFragment = chapterHref.substringBefore('#')
 		return searchRecursively(tocEntries, chapterHrefWithoutFragment)
 	}
 
 	private fun searchRecursively(
-		entries: List<TocEntry>,
+		entries: List<EpubBook.TocEntry>,
 		chapterHrefWithoutFragment: String
-	): TocEntry? {
+	): EpubBook.TocEntry? {
 		for (entry in entries) {
-			if (entry.chapterLink
-				.substringBefore('#')
-				.equals(chapterHrefWithoutFragment, ignoreCase = true)
+			if (entry.chapterLink.substringBefore('#')
+					.equals(chapterHrefWithoutFragment, ignoreCase = true)
 			) {
 				return entry
 			}
-			val foundInChildren: TocEntry? =
+			val foundInChildren: EpubBook.TocEntry? =
 				searchRecursively(entry.children, chapterHrefWithoutFragment)
 			if (foundInChildren != null) {
 				return foundInChildren
