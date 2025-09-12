@@ -61,8 +61,9 @@ class ChapterParser @Inject constructor() {
 		chapterHrefWithoutFragment: String
 	): EpubBook.TocEntry? {
 		for (entry in entries) {
-			if (entry.chapterLink.substringBefore('#')
-					.equals(chapterHrefWithoutFragment, ignoreCase = true)
+			if (entry.chapterLink
+				.substringBefore('#')
+				.equals(chapterHrefWithoutFragment, ignoreCase = true)
 			) {
 				return entry
 			}

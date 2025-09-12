@@ -7,4 +7,5 @@ data class Book(
 	val author: String?,
 	val description: String?,
 	val totalChapters: Int,
+	val chapters: List<SimpleChapter>
 )
