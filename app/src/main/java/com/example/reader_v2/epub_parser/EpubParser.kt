@@ -65,8 +65,7 @@ class EpubParser @Inject constructor(
 			?: manifestItems.values.firstOrNull {
 				it.properties.contains("nav") || it.properties.contains("toc")
 			}?.hrefFullPath
-		val tocFile: EpubFile =
-			files[tocFilePath] ?: throw FileNotFoundException("Toc file missing")
+		val tocFile: EpubFile = files[tocFilePath] ?: throw FileNotFoundException("Toc file missing")
 		val tocEntries: List<EpubBook.TocEntry> = tocParser.parse(tocFile, hrefRootPath)
 
 		val spine: Element = opfDoc.selectFirst("spine")
@@ -78,7 +77,7 @@ class EpubParser @Inject constructor(
 			spine = spine,
 		)
 
-		return@withContext EpubBook(
+		EpubBook(
 			fileName = title.asFileName(),
 			title = title,
 			author = author,
