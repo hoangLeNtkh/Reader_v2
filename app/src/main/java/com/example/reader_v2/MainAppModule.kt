@@ -12,11 +12,13 @@ import jakarta.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object MainAppModule {
-	@Provides
-	@Singleton
-	fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase = AppDatabase.getDatabase(context)
+    @Provides
+    @Singleton
+    fun provideAppDatabase(
+        @ApplicationContext context: Context,
+    ): AppDatabase = AppDatabase.getDatabase(context)
 
-	@Provides
-	@Singleton
-	fun provideBookDao(appDatabase: AppDatabase) = appDatabase.bookDao()
+    @Provides
+    @Singleton
+    fun provideBookDao(appDatabase: AppDatabase) = appDatabase.bookDao()
 }
