@@ -11,7 +11,7 @@ import jakarta.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-	@Binds
-	@Singleton
-	abstract fun bindBookRepository(bookRepositoryImpl: BookRepositoryImpl): BookRepository
+    @Binds
+    @Singleton
+    abstract fun bindBookRepository(bookRepositoryImpl: BookRepositoryImpl): BookRepository
 }

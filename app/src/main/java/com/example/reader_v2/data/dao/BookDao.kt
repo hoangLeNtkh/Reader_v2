@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookDao {
-	@Query("SELECT * FROM books")
-	fun getAllBooks(): Flow<List<BookEntity>>
+    @Query("SELECT * FROM books")
+    fun getAllBooks(): Flow<List<BookEntity>>
 
-	@Query("SELECT * FROM books WHERE id = :bookId")
-	fun getBookById(bookId: String): Flow<BookEntity?>
+    @Query("SELECT * FROM books WHERE id = :bookId")
+    fun getBookById(bookId: String): Flow<BookEntity?>
 
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insertBook(book: BookEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBook(book: BookEntity)
 
-	@Delete
-	fun deleteBook(book: BookEntity)
+    @Delete
+    fun deleteBook(book: BookEntity)
 }

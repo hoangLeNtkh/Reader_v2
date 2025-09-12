@@ -10,29 +10,29 @@ import com.example.reader_v2.data.entity.BookEntity
 import com.example.reader_v2.data.helper.Converters
 
 @Database(
-	entities = [BookEntity::class],
-	version = 1,
-	exportSchema = false
+    entities = [BookEntity::class],
+    version = 1,
+    exportSchema = false,
 )
 @TypeConverters(Converters::class)
-
 abstract class AppDatabase : RoomDatabase() {
-	abstract fun bookDao(): BookDao
+    abstract fun bookDao(): BookDao
 
-	companion object {
-		@Volatile
-		private var INSTANCE: AppDatabase? = null
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
 
-		fun getDatabase(context: Context): AppDatabase {
-			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(
-					context.applicationContext,
-					AppDatabase::class.java,
-					"app_database"
-				).build()
-				INSTANCE = instance
-				instance
-			}
-		}
-	}
+        fun getDatabase(context: Context): AppDatabase =
+            INSTANCE ?: synchronized(this) {
+                val instance =
+                    Room
+                        .databaseBuilder(
+                            context.applicationContext,
+                            AppDatabase::class.java,
+                            "app_database",
+                        ).build()
+                INSTANCE = instance
+                instance
+            }
+    }
 }

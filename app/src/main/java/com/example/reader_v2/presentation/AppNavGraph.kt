@@ -7,25 +7,25 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reader_v2.presentation.screen.library.LibraryScreen
 
 sealed class Screen(
-	val route: String,
-	val title: String
+    val route: String,
+    val title: String,
 ) {
-	object Library : Screen(
-		route = "library",
-		title = "Library"
-	)
+    object Library : Screen(
+        route = "library",
+        title = "Library",
+    )
 }
 
 @Composable
 fun AppNavGraph() {
-	val navController = rememberNavController()
+    val navController = rememberNavController()
 
-	NavHost(
-		navController = navController,
-		startDestination = Screen.Library.route
-	) {
-		composable(route = Screen.Library.route) {
-			LibraryScreen()
-		}
-	}
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Library.route,
+    ) {
+        composable(route = Screen.Library.route) {
+            LibraryScreen()
+        }
+    }
 }
