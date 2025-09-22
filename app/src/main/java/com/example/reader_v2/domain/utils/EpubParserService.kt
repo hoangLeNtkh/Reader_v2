@@ -1,4 +1,4 @@
-package com.example.reader_v2.domain.helper
+package com.example.reader_v2.domain.utils
 
 import com.example.reader_v2.epub_parser.EpubParser
 import com.example.reader_v2.epub_parser.model.EpubBook
