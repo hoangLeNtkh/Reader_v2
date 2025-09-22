@@ -3,7 +3,7 @@ package com.example.reader_v2.data.repository
 import android.net.Uri
 import com.example.reader_v2.data.dao.BookDao
 import com.example.reader_v2.data.entity.BookEntity
-import com.example.reader_v2.data.helper.BookFileDataSource
+import com.example.reader_v2.data.data_source.BookFileDataSource
 import com.example.reader_v2.domain.helper.EpubParserService
 import com.example.reader_v2.domain.model.Book
 import com.example.reader_v2.domain.model.SimpleChapter

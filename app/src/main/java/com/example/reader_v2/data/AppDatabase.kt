@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.reader_v2.data.dao.BookDao
 import com.example.reader_v2.data.entity.BookEntity
-import com.example.reader_v2.data.helper.Converters
+import com.example.reader_v2.data.util.Converters
 
 @Database(
     entities = [BookEntity::class],

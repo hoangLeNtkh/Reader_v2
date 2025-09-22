@@ -1,4 +1,4 @@
-package com.example.reader_v2.data.helper
+package com.example.reader_v2.data.util
 
 import androidx.room.TypeConverter
 import com.example.reader_v2.domain.model.SimpleChapter
