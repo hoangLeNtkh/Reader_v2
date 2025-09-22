@@ -1,4 +1,4 @@
-package com.example.reader_v2.epub_parser.helpers
+package com.example.reader_v2.epub_parser.utils
 
 import com.example.reader_v2.epub_parser.model.EpubBook
 import com.fleeksoft.ksoup.nodes.Element

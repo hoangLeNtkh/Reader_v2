@@ -2,7 +2,7 @@ package com.example.reader_v2.data.data_source
 
 import android.content.Context
 import android.net.Uri
-import com.example.reader_v2.epub_parser.helpers.getEntries
+import com.example.reader_v2.epub_parser.utils.getEntries
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
