@@ -10,8 +10,10 @@ import com.example.reader_v2.domain.model.SimpleChapter
 import com.example.reader_v2.epub_parser.model.EpubBook
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
@@ -25,12 +27,11 @@ class BookRepositoryImpl
     ) : BookRepository {
         override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
-        override suspend fun addAndExtractBook(uri: Uri): String {
+        override suspend fun addAndExtractBook(uri: Uri): String = withContext(Dispatchers.IO) {
             val bookId: String = UUID.randomUUID().toString()
-            var bookFilePath: File? = null
-            val fileName = uri.lastPathSegment ?: "Unknown"
+	        val fileName = uri.lastPathSegment ?: "Unknown"
 
-            bookFilePath = fileDataSource.saveBookToAppStorage(uri, bookId)
+	        val bookFilePath = fileDataSource.saveBookToAppStorage(uri, bookId)
 
             val epubBook: EpubBook = epubParserService.parseEpub(bookFilePath)
             val simpleChapters: List<SimpleChapter> =
@@ -51,7 +52,7 @@ class BookRepositoryImpl
             bookDao.insertBook(bookEntity)
             fileDataSource.extractEpub(bookFilePath, bookId)
 
-            return fileName
+            fileName
         }
 
         private fun BookEntity.toModel(): Book =

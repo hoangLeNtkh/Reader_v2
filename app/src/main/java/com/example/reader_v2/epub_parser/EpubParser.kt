@@ -1,11 +1,11 @@
 package com.example.reader_v2.epub_parser
 
-import com.example.reader_v2.epub_parser.helpers.ChapterParser
-import com.example.reader_v2.epub_parser.helpers.TocParser
-import com.example.reader_v2.epub_parser.helpers.ZippedFilesReader
-import com.example.reader_v2.epub_parser.helpers.asFileName
-import com.example.reader_v2.epub_parser.helpers.decodedUrl
-import com.example.reader_v2.epub_parser.helpers.findHrefFullPath
+import com.example.reader_v2.epub_parser.utils.ChapterParser
+import com.example.reader_v2.epub_parser.utils.TocParser
+import com.example.reader_v2.epub_parser.utils.ZippedFilesReader
+import com.example.reader_v2.epub_parser.utils.asFileName
+import com.example.reader_v2.epub_parser.utils.decodedUrl
+import com.example.reader_v2.epub_parser.utils.findHrefFullPath
 import com.example.reader_v2.epub_parser.model.EpubBook
 import com.example.reader_v2.epub_parser.model.EpubFile
 import com.fleeksoft.ksoup.Ksoup

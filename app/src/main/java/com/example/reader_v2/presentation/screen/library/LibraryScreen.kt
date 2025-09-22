@@ -27,8 +27,8 @@ import com.example.reader_v2.presentation.component.BookCard
 
 @Composable
 fun LibraryScreen(
-    libViewModel: LibraryViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    libViewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val books: List<Book> by libViewModel.books.collectAsState(
         initial = emptyList(),
@@ -58,7 +58,7 @@ fun LibraryScreen(
                 )
             }
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         if (books.isEmpty()) {
             Box(
