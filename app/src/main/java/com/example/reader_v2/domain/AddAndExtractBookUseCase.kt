@@ -2,7 +2,7 @@ package com.example.reader_v2.domain
 
 import android.net.Uri
 import com.example.reader_v2.data.repository.BookRepository
-import com.example.reader_v2.domain.helper.Outcome
+import com.example.reader_v2.domain.utils.Outcome
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 

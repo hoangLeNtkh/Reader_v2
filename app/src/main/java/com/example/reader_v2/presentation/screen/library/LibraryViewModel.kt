@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
 import com.example.reader_v2.domain.AddAndExtractBookUseCase
-import com.example.reader_v2.domain.helper.Outcome
+import com.example.reader_v2.domain.utils.Outcome
 import com.example.reader_v2.domain.model.Book
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
