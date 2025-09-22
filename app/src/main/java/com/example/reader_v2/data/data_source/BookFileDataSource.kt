@@ -32,13 +32,13 @@ class BookFileDataSource
 	        bookId: String,
         ): File =
 	        withContext(Dispatchers.IO) {
-		        val bookFilePath = File(booksDir, "$bookId.epub")
+		        val bookFile = File(booksDir, "$bookId.epub")
 		        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-			        bookFilePath.outputStream().use { outputStream ->
+			        bookFile.outputStream().use { outputStream ->
 				        inputStream.copyTo(outputStream)
 			        }
-		        } ?: throw IOException("Failed to open input stream for URI: $uri")
-		        bookFilePath
+		        } ?: throw IOException("Failed to save book with URI: $uri")
+		        bookFile
 	        }
 
         suspend fun extractEpub(

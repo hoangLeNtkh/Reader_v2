@@ -15,7 +15,7 @@ class ZippedFilesReader
         suspend fun getZippedFiles(inputStream: InputStream): Map<String, EpubFile> =
             withContext(Dispatchers.IO) {
                 inputStream.use { stream ->
-                    stream.buffered().let {
+                    stream.let {
                         ZipInputStream(it).use { zis ->
                             zis
                                 .getEntries()

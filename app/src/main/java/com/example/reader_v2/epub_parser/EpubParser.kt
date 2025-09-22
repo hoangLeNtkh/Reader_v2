@@ -60,7 +60,7 @@ class EpubParser
                     metadata.selectFirst("description")?.ownText()
                         ?: metadata.selectFirst("dc|description")?.ownText()
 
-                val hrefRootPath: File = File(opfFilePath).parentFile ?: File("")
+                val hrefRootPath = File(opfFilePath).parentFile ?: File("")
 
                 val manifest: Element =
                     opfDoc.selectFirst("manifest")

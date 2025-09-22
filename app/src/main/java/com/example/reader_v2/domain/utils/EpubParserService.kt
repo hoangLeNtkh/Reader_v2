@@ -14,8 +14,8 @@ class EpubParserService
     constructor(
         private val epubParser: EpubParser,
     ) {
-        suspend fun parseEpub(epubFilePath: File): EpubBook =
+        suspend fun parseBook(epubFile: File): EpubBook =
             withContext(Dispatchers.Default) {
-                epubFilePath.inputStream().buffered().use { epubParser.parse(it) }
+                epubFile.inputStream().buffered().use { epubParser.parse(it) }
             }
     }

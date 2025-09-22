@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.util.UUID
 
 @Singleton
@@ -28,20 +27,22 @@ class BookRepositoryImpl
         override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
         override suspend fun addAndExtractBook(uri: Uri): String = withContext(Dispatchers.IO) {
-            val bookId: String = UUID.randomUUID().toString()
+            val bookId = UUID.randomUUID().toString()
 	        val fileName = uri.lastPathSegment ?: "Unknown"
 
-	        val bookFilePath = fileDataSource.saveBookToAppStorage(uri, bookId)
+	        val bookFile = fileDataSource.saveBookToAppStorage(uri, bookId)
 
-            val epubBook: EpubBook = epubParserService.parseEpub(bookFilePath)
+            val epubBook: EpubBook = epubParserService.parseBook(bookFile)
+
             val simpleChapters: List<SimpleChapter> =
                 epubBook.chapters.map { chapter ->
                     SimpleChapter(title = chapter.title, filePath = chapter.filePath)
                 }
+
             val bookEntity =
                 BookEntity(
                     id = bookId,
-                    filePath = bookFilePath.absolutePath,
+                    filePath = bookFile.absolutePath,
                     title = fileName,
                     author = epubBook.author,
                     description = epubBook.description,
@@ -50,7 +51,8 @@ class BookRepositoryImpl
                 )
 
             bookDao.insertBook(bookEntity)
-            fileDataSource.extractEpub(bookFilePath, bookId)
+
+            fileDataSource.extractEpub(bookFile, bookId)
 
             fileName
         }
