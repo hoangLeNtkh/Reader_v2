@@ -30,7 +30,9 @@ class LibraryViewModel
 
         fun addAndExtractBook(uri: Uri) {
             viewModelScope.launch {
-                when (val result = addAndExtractBookUseCase(uri)) {
+                val result = addAndExtractBookUseCase(uri)
+
+                when (result) {
                     is Outcome.Success -> {
                         val bookId = result.data
                         println("Successfully added book with ID: $bookId")

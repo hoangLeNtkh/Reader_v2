@@ -67,16 +67,16 @@ fun LibraryScreen(
             ) {
                 Text(text = "Your library is empty")
                 Button(
-                    onClick = { filePickerScreenLauncher.launch(arrayOf("application/epub+zip")) },
                     modifier = Modifier.padding(16.dp),
+                    onClick = { filePickerScreenLauncher.launch(arrayOf("application/epub+zip")) },
                 ) {
                     Text(text = "Select EPUB File")
                 }
             }
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 128.dp),
                 modifier = Modifier.padding(innerPadding),
+                columns = GridCells.Adaptive(minSize = 128.dp),
             ) {
                 items(
                     items = books,
