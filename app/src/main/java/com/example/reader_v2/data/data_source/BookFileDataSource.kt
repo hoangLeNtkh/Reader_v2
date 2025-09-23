@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 class BookFileDataSource
     @Inject
     constructor(
-	    @ApplicationContext private val context: Context,
+        @ApplicationContext private val context: Context,
     ) {
         private val booksDir =
             File(context.filesDir, "books").apply {
@@ -27,39 +27,38 @@ class BookFileDataSource
                 if (!exists()) mkdirs()
             }
 
-        suspend fun saveBookToAppStorage(
-	        uri: Uri,
-	        bookId: String,
-        ): File =
-	        withContext(Dispatchers.IO) {
-		        val bookFile = File(booksDir, "$bookId.epub")
-		        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-			        bookFile.outputStream().use { outputStream ->
-				        inputStream.copyTo(outputStream)
-			        }
-		        } ?: throw IOException("Failed to save book with URI: $uri")
-		        bookFile
-	        }
+        fun saveBookToAppStorage(
+            uri: Uri,
+            bookId: String,
+        ): File {
+            val bookFile = File(booksDir, "$bookId.epub")
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                bookFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            } ?: throw IOException("Failed to save book with URI: $uri")
+            return bookFile
+        }
 
         suspend fun extractEpub(
-	        epubFile: File,
-	        bookId: String,
+            epubFile: File,
+            bookId: String,
         ) = withContext(Dispatchers.IO) {
-	        val destinationDir = File(extractedBooksDir, bookId)
-	        if (destinationDir.exists()) destinationDir.deleteRecursively()
-	        destinationDir.mkdirs()
+            val destinationDir = File(extractedBooksDir, bookId)
+            if (destinationDir.exists()) destinationDir.deleteRecursively()
+            destinationDir.mkdirs()
 
-	        ZipInputStream(epubFile.inputStream()).use { zipInput ->
-		        zipInput
-			        .getEntries()
-			        .filterNot { it.isDirectory }
-			        .forEach { zipEntry ->
-				        val file = File(destinationDir, zipEntry.name)
-				        file.parentFile?.mkdirs()
-				        file.outputStream().use { fileOutput ->
-					        zipInput.copyTo(fileOutput)
-				        }
-			        }
-	        }
+            ZipInputStream(epubFile.inputStream()).use { zipInput ->
+                zipInput
+                    .getEntries()
+                    .filterNot { it.isDirectory }
+                    .forEach { zipEntry ->
+                        val file = File(destinationDir, zipEntry.name)
+                        file.parentFile?.mkdirs()
+                        file.outputStream().use { fileOutput ->
+                            zipInput.copyTo(fileOutput)
+                        }
+                    }
+            }
         }
     }

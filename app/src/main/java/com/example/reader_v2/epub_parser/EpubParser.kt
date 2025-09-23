@@ -1,13 +1,13 @@
 package com.example.reader_v2.epub_parser
 
+import com.example.reader_v2.epub_parser.model.EpubBook
+import com.example.reader_v2.epub_parser.model.EpubFile
 import com.example.reader_v2.epub_parser.utils.ChapterParser
 import com.example.reader_v2.epub_parser.utils.TocParser
 import com.example.reader_v2.epub_parser.utils.ZippedFilesReader
 import com.example.reader_v2.epub_parser.utils.asFileName
 import com.example.reader_v2.epub_parser.utils.decodedUrl
 import com.example.reader_v2.epub_parser.utils.findHrefFullPath
-import com.example.reader_v2.epub_parser.model.EpubBook
-import com.example.reader_v2.epub_parser.model.EpubFile
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
+import kotlin.io.buffered
 
 @Singleton
 class EpubParser
@@ -27,9 +28,12 @@ class EpubParser
         private val tocParser: TocParser,
         private val chapterParser: ChapterParser,
     ) {
-        suspend fun parse(inputStream: InputStream) =
+        suspend fun parse(bookFile: File) =
             withContext(Dispatchers.Default) {
-                val files: Map<String, EpubFile> = zippedFilesReader.getZippedFiles(inputStream)
+                val files: Map<String, EpubFile> =
+                    bookFile.inputStream().buffered().use { inputStream ->
+                        zippedFilesReader.getZippedFiles(inputStream)
+                    }
 
                 val container: EpubFile =
                     files["META-INF/container.xml"]
