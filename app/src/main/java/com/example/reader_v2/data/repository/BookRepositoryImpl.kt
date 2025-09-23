@@ -2,11 +2,11 @@ package com.example.reader_v2.data.repository
 
 import android.net.Uri
 import com.example.reader_v2.data.dao.BookDao
-import com.example.reader_v2.data.entity.BookEntity
 import com.example.reader_v2.data.data_source.BookFileDataSource
-import com.example.reader_v2.domain.utils.EpubParserService
+import com.example.reader_v2.data.entity.BookEntity
 import com.example.reader_v2.domain.model.Book
 import com.example.reader_v2.domain.model.SimpleChapter
+import com.example.reader_v2.epub_parser.EpubParser
 import com.example.reader_v2.epub_parser.model.EpubBook
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -21,41 +21,42 @@ class BookRepositoryImpl
     @Inject
     constructor(
         private val fileDataSource: BookFileDataSource,
-        private val epubParserService: EpubParserService,
+        private val epubParser: EpubParser,
         private val bookDao: BookDao,
     ) : BookRepository {
         override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
-        override suspend fun addAndExtractBook(uri: Uri): String = withContext(Dispatchers.IO) {
-            val bookId = UUID.randomUUID().toString()
-	        val fileName = uri.lastPathSegment ?: "Unknown"
+        override suspend fun addAndExtractBook(uri: Uri): String =
+            withContext(Dispatchers.IO) {
+                val bookId = UUID.randomUUID().toString()
+                val fileName = uri.lastPathSegment ?: "Unknown"
 
-	        val bookFile = fileDataSource.saveBookToAppStorage(uri, bookId)
+                val bookFile = fileDataSource.saveBookToAppStorage(uri, bookId)
 
-            val epubBook: EpubBook = epubParserService.parseBook(bookFile)
+                val epubBook: EpubBook = epubParser.parse(bookFile)
 
-            val simpleChapters: List<SimpleChapter> =
-                epubBook.chapters.map { chapter ->
-                    SimpleChapter(title = chapter.title, filePath = chapter.filePath)
-                }
+                val simpleChapters: List<SimpleChapter> =
+                    epubBook.chapters.map { chapter ->
+                        SimpleChapter(title = chapter.title, filePath = chapter.filePath)
+                    }
 
-            val bookEntity =
-                BookEntity(
-                    id = bookId,
-                    filePath = bookFile.absolutePath,
-                    title = fileName,
-                    author = epubBook.author,
-                    description = epubBook.description,
-                    totalChapters = epubBook.chapters.size,
-                    chapters = simpleChapters,
-                )
+                val bookEntity =
+                    BookEntity(
+                        id = bookId,
+                        filePath = bookFile.absolutePath,
+                        title = fileName,
+                        author = epubBook.author,
+                        description = epubBook.description,
+                        totalChapters = epubBook.chapters.size,
+                        chapters = simpleChapters,
+                    )
 
-            bookDao.insertBook(bookEntity)
+                bookDao.insertBook(bookEntity)
 
-            fileDataSource.extractEpub(bookFile, bookId)
+                fileDataSource.extractEpub(bookFile, bookId)
 
-            fileName
-        }
+                fileName
+            }
 
         private fun BookEntity.toModel(): Book =
             Book(
