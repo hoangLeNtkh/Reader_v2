@@ -64,42 +64,33 @@ class ReaderViewModel
             }
 
             viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    val book: Book? = repository.getBookById(bookId)
-                    if (book == null) {
-                        Log.e(TAG, "Book with ID $bookId not found.")
-                        _uiState.update { it.copy(isLoading = false, error = "Book not found") }
-                        return@launch
-                    }
-
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            currentBook = book,
-                            currentReadPosition = book.lastReadPosition,
-                            title = book.title,
-                            currentChapterIndex = book.lastReadChapterIndex.coerceAtLeast(0),
-                            totalChapters = book.chapters.size,
-                            canNavigateNext = book.lastReadChapterIndex < book.chapters.size - 1,
-                            canNavigatePrevious = book.lastReadChapterIndex > 0,
-                        )
-                    }
-
-                    loadChapter(uiState.value.currentChapterIndex)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error in loadBookContent", e)
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = e.localizedMessage ?: "Unknown error",
-                        )
-                    }
+                val book: Book? = repository.getBookById(bookId)
+                if (book == null) {
+                    Log.e(TAG, "Book with ID $bookId not found.")
+                    _uiState.update { it.copy(isLoading = false, error = "Book not found") }
+                    return@launch
                 }
+
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        currentBook = book,
+                        currentReadPosition = book.lastReadPosition,
+                        title = book.title,
+                        currentChapterIndex = book.lastReadChapterIndex.coerceAtLeast(0),
+                        totalChapters = book.chapters.size,
+                        canNavigateNext = book.lastReadChapterIndex < book.chapters.size - 1,
+                        canNavigatePrevious = book.lastReadChapterIndex > 0,
+                    )
+                }
+
+                loadChapter(uiState.value.currentChapterIndex)
             }
         }
 
         fun loadChapter(chapterIndex: Int) {
             val book = uiState.value.currentBook ?: return
+
             if (chapterIndex < 0 || chapterIndex >= book.chapters.size) {
                 Log.e(
                     TAG,

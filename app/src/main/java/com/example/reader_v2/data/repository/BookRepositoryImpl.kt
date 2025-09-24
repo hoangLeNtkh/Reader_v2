@@ -57,6 +57,9 @@ class BookRepositoryImpl
                         chapters = simpleChapters,
                         lastReadChapterIndex = 0,
                         lastReadPosition = 0f,
+                        dateAdded = System.currentTimeMillis(),
+                        lastReadDate = System.currentTimeMillis(),
+                        readProgress = 0f,
                     )
 
                 bookDao.insertBook(bookEntity)
@@ -77,5 +80,8 @@ class BookRepositoryImpl
                 chapters = chapters,
                 lastReadChapterIndex = lastReadChapterIndex,
                 lastReadPosition = lastReadPosition,
+                dateAdded = dateAdded,
+                lastReadDate = lastReadDate,
+                readProgress = readProgress,
             )
     }
