@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reader_v2.presentation.screen.library.LibraryScreen
+import com.example.reader_v2.presentation.screen.reader.ReaderScreen
 
 sealed class Screen(
     val route: String,
@@ -14,6 +15,13 @@ sealed class Screen(
         route = "library",
         title = "Library",
     )
+
+    object Reader : Screen(
+        route = "reader",
+        title = "Reader",
+    ) {
+        fun createRoute(bookId: String): String = "reader/$bookId"
+    }
 }
 
 @Composable
@@ -25,7 +33,15 @@ fun AppNavGraph() {
         startDestination = Screen.Library.route,
     ) {
         composable(route = Screen.Library.route) {
-            LibraryScreen()
+            LibraryScreen(
+                onBookClick = { bookId ->
+                    navController.navigate(Screen.Reader.createRoute(bookId))
+                },
+            )
+        }
+
+        composable(route = Screen.Reader.route) {
+            ReaderScreen()
         }
     }
 }

@@ -29,6 +29,7 @@ import com.example.reader_v2.presentation.component.BookCard
 fun LibraryScreen(
     modifier: Modifier = Modifier,
     libViewModel: LibraryViewModel = hiltViewModel(),
+    onBookClick: (String) -> Unit,
 ) {
     val books: List<Book> by libViewModel.books.collectAsState(
         initial = emptyList(),

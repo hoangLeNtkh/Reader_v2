@@ -14,4 +14,6 @@ data class BookEntity(
     val description: String?,
     val totalChapters: Int,
     val chapters: List<SimpleChapter>,
+    val lastReadChapterIndex: Int,
+    val lastReadPosition: Float,
 )
