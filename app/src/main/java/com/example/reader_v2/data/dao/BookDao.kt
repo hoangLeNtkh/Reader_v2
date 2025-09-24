@@ -14,7 +14,7 @@ interface BookDao {
     fun getAllBooks(): Flow<List<BookEntity>>
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBookById(bookId: String): Flow<BookEntity?>
+    fun getBookById(bookId: String): BookEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBook(book: BookEntity)

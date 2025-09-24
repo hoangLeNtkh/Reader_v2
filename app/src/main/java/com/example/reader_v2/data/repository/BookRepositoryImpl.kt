@@ -26,6 +26,13 @@ class BookRepositoryImpl
     ) : BookRepository {
         override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
+        override suspend fun getBookById(bookId: String): Book? = bookDao.getBookById(bookId)?.toModel()
+
+        override fun getChapterUrl(
+            bookId: String,
+            chapterFilePath: String,
+        ): String = fileDataSource.getChapterFileUrl(bookId, chapterFilePath)
+
         override suspend fun addAndExtractBook(uri: Uri): String =
             withContext(Dispatchers.IO) {
                 val bookId = UUID.randomUUID().toString()
@@ -39,7 +46,6 @@ class BookRepositoryImpl
                     epubBook.chapters.map { chapter ->
                         SimpleChapter(title = chapter.title, filePath = chapter.filePath)
                     }
-
                 val bookEntity =
                     BookEntity(
                         id = bookId,
@@ -49,6 +55,8 @@ class BookRepositoryImpl
                         description = epubBook.description,
                         totalChapters = epubBook.chapters.size,
                         chapters = simpleChapters,
+                        lastReadChapterIndex = 0,
+                        lastReadPosition = 0f,
                     )
 
                 bookDao.insertBook(bookEntity)
@@ -67,5 +75,7 @@ class BookRepositoryImpl
                 description = description,
                 totalChapters = totalChapters,
                 chapters = chapters,
+                lastReadChapterIndex = lastReadChapterIndex,
+                lastReadPosition = lastReadPosition,
             )
     }

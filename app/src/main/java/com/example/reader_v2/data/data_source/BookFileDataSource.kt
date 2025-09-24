@@ -9,6 +9,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.zip.ZipInputStream
 
@@ -61,4 +62,17 @@ class BookFileDataSource
                     }
             }
         }
+
+        fun getChapterFileUrl(
+            bookId: String,
+            chapterFilePath: String,
+        ): String {
+            val chapterFile = File(getExtractedBookPath(bookId), chapterFilePath)
+            if (!chapterFile.exists()) {
+                throw FileNotFoundException("Chapter file not found: ${chapterFile.absolutePath}")
+            }
+            return "file://${chapterFile.absolutePath}"
+        }
+
+        fun getExtractedBookPath(bookId: String): File = File(extractedBooksDir, bookId)
     }
