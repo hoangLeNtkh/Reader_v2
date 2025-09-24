@@ -10,4 +10,7 @@ data class Book(
     val chapters: List<SimpleChapter>,
     val lastReadChapterIndex: Int,
     val lastReadPosition: Float,
+    val dateAdded: Long,
+    val lastReadDate: Long,
+    val readProgress: Float,
 )
