@@ -9,10 +9,11 @@ import com.example.reader_v2.domain.model.Book
 
 @Composable
 fun BookCard(
-    book: Book,
     modifier: Modifier = Modifier,
+    book: Book,
+    onClick: () -> Unit,
 ) {
-    Column {
+    Column(modifier = modifier.clickable(onClick = onClick)) {
         Text(text = book.title)
         book.author?.let {
             Text(text = it)
