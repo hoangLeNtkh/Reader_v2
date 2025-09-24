@@ -17,7 +17,7 @@ sealed class Screen(
     )
 
     object Reader : Screen(
-        route = "reader",
+        route = "reader/{bookId}",
         title = "Reader",
     ) {
         fun createRoute(bookId: String): String = "reader/$bookId"

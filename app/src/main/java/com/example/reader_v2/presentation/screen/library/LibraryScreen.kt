@@ -85,6 +85,7 @@ fun LibraryScreen(
                 ) { book ->
                     BookCard(
                         book = book,
+                        onClick = { onBookClick(book.id) },
                     )
                 }
             }
