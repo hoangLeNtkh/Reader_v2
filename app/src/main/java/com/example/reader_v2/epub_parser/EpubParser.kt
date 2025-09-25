@@ -2,12 +2,12 @@ package com.example.reader_v2.epub_parser
 
 import com.example.reader_v2.epub_parser.model.EpubBook
 import com.example.reader_v2.epub_parser.model.EpubFile
-import com.example.reader_v2.epub_parser.utils.ChapterParser
-import com.example.reader_v2.epub_parser.utils.TocParser
-import com.example.reader_v2.epub_parser.utils.ZippedFilesReader
-import com.example.reader_v2.epub_parser.utils.asFileName
-import com.example.reader_v2.epub_parser.utils.decodedUrl
-import com.example.reader_v2.epub_parser.utils.findHrefFullPath
+import com.example.reader_v2.epub_parser.util.ChapterParser
+import com.example.reader_v2.epub_parser.util.TocParser
+import com.example.reader_v2.epub_parser.util.ZippedFilesReader
+import com.example.reader_v2.epub_parser.util.asFileName
+import com.example.reader_v2.epub_parser.util.decodedUrl
+import com.example.reader_v2.epub_parser.util.findHrefFullPath
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
@@ -17,8 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.InputStream
-import kotlin.io.buffered
 
 @Singleton
 class EpubParser
@@ -82,13 +80,14 @@ class EpubParser
                         }.associateBy { it.id }
 
                 val tocFilePath: String? =
-                    manifestItems["toc"]?.hrefFullPath
-                        ?: manifestItems["nav"]?.hrefFullPath
-                        ?: manifestItems.values
-                            .firstOrNull {
-                                it.properties.contains("nav") || it.properties.contains("toc")
-                            }?.hrefFullPath
-                val tocFile: EpubFile = files[tocFilePath] ?: throw FileNotFoundException("Toc file missing")
+                    manifestItems
+                        .values
+                        .firstOrNull {
+                            it.properties.contains("nav") || it.properties.contains("toc")
+                        }?.hrefFullPath
+                val tocFile: EpubFile =
+                    files[tocFilePath]
+                        ?: throw FileNotFoundException("Toc file missing")
                 val tocEntries: List<EpubBook.TocEntry> = tocParser.parse(tocFile, hrefRootPath)
 
                 val spine: Element =
@@ -102,12 +101,20 @@ class EpubParser
                         spine = spine,
                     )
 
+                val coverImagePath: String? =
+                    manifestItems
+                        .values
+                        .firstOrNull {
+                            it.properties.contains("cover")
+                        }?.hrefFullPath
+
                 EpubBook(
-                    fileName = title.asFileName(),
-                    title = title,
-                    author = author,
-                    description = description,
-                    chapters = chapters,
+	                fileName = title.asFileName(),
+	                title = title,
+	                author = author,
+	                description = description,
+	                chapters = chapters,
+	                coverImagePath = coverImagePath,
                 )
             }
     }

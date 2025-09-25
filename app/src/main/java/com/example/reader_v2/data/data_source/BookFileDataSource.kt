@@ -2,7 +2,7 @@ package com.example.reader_v2.data.data_source
 
 import android.content.Context
 import android.net.Uri
-import com.example.reader_v2.epub_parser.utils.getEntries
+import com.example.reader_v2.epub_parser.util.getEntries
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -33,11 +33,13 @@ class BookFileDataSource
             bookId: String,
         ): File {
             val bookFile = File(booksDir, "$bookId.epub")
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+
+            context.contentResolver.openInputStream(uri)!!.buffered().let { inputStream ->
                 bookFile.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
+	                inputStream.copyTo(outputStream)
                 }
-            } ?: throw IOException("Failed to save book with URI: $uri")
+            }
+
             return bookFile
         }
 

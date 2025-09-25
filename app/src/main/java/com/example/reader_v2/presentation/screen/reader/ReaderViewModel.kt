@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private const val TAG = "ReaderViewModel"
 
@@ -64,27 +63,32 @@ class ReaderViewModel
             }
 
             viewModelScope.launch(Dispatchers.IO) {
-                val book: Book? = repository.getBookById(bookId)
-                if (book == null) {
+                try {
+                    val book: Book? = repository.getBookById(bookId)
+                    if (book == null) {
+                        Log.e(TAG, "Book with ID $bookId not found.")
+                        _uiState.update { it.copy(isLoading = false, error = "Book not found") }
+                        return@launch
+                    }
+
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            currentBook = book,
+                            currentReadPosition = book.lastReadPosition,
+                            title = book.title,
+                            currentChapterIndex = book.lastReadChapterIndex.coerceAtLeast(0),
+                            totalChapters = book.chapters.size,
+                            canNavigateNext = book.lastReadChapterIndex < book.chapters.size - 1,
+                            canNavigatePrevious = book.lastReadChapterIndex > 0,
+                        )
+                    }
+
+                    loadChapter(uiState.value.currentChapterIndex)
+                } catch (e: Exception) {
                     Log.e(TAG, "Book with ID $bookId not found.")
                     _uiState.update { it.copy(isLoading = false, error = "Book not found") }
-                    return@launch
                 }
-
-                _uiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        currentBook = book,
-                        currentReadPosition = book.lastReadPosition,
-                        title = book.title,
-                        currentChapterIndex = book.lastReadChapterIndex.coerceAtLeast(0),
-                        totalChapters = book.chapters.size,
-                        canNavigateNext = book.lastReadChapterIndex < book.chapters.size - 1,
-                        canNavigatePrevious = book.lastReadChapterIndex > 0,
-                    )
-                }
-
-                loadChapter(uiState.value.currentChapterIndex)
             }
         }
 
@@ -104,8 +108,8 @@ class ReaderViewModel
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val chapterToLoad: SimpleChapter = book.chapters[chapterIndex]
-
                     val chapterUrl = repository.getChapterUrl(book.id, chapterToLoad.filePath)
+
                     _uiState.update {
                         it.copy(
                             currentChapterFileUrl = chapterUrl,
@@ -118,13 +122,11 @@ class ReaderViewModel
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error loading chapter $chapterIndex", e)
-                    withContext(Dispatchers.Main) {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                error = e.message ?: "Failed to load chapter",
-                            )
-                        }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Failed to load chapter",
+                        )
                     }
                 }
             }
