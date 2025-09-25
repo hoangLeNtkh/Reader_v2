@@ -4,9 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
-import com.example.reader_v2.domain.AddAndExtractBookUseCase
 import com.example.reader_v2.domain.model.Book
-import com.example.reader_v2.domain.utils.Outcome
+import com.example.reader_v2.domain.util.Outcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +17,6 @@ import kotlinx.coroutines.launch
 class LibraryViewModel
     @Inject
     constructor(
-        private val addAndExtractBookUseCase: AddAndExtractBookUseCase,
         private val repository: BookRepository,
     ) : ViewModel() {
         val books: StateFlow<List<Book>> =
@@ -30,17 +28,11 @@ class LibraryViewModel
 
         fun addAndExtractBook(uri: Uri) {
             viewModelScope.launch {
-                val result = addAndExtractBookUseCase(uri)
-
-                when (result) {
-                    is Outcome.Success -> {
-                        val bookId = result.data
-                        println("Successfully added book with ID: $bookId")
-                    }
-                    is Outcome.Error -> {
-                        val error = result.error
-                        println("Error adding book: ${error.message}")
-                    }
+                try {
+                    val bookId = repository.addAndExtractBook(uri)
+                    println("Successfully added book with ID: $bookId")
+                } catch (e: Exception) {
+                    println("Error adding book: ${e.message}")
                 }
             }
         }

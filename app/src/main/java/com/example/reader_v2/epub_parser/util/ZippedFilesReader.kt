@@ -1,4 +1,4 @@
-package com.example.reader_v2.epub_parser.utils
+package com.example.reader_v2.epub_parser.util
 
 import com.example.reader_v2.epub_parser.model.EpubFile
 import jakarta.inject.Inject

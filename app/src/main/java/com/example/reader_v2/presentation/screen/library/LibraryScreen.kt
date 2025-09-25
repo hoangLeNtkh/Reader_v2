@@ -31,15 +31,17 @@ fun LibraryScreen(
     libViewModel: LibraryViewModel = hiltViewModel(),
     onBookClick: (String) -> Unit,
 ) {
-    val books: List<Book> by libViewModel.books.collectAsState(
+    val books by libViewModel.books.collectAsState(
         initial = emptyList(),
     )
     val filePickerScreenLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument(),
             onResult = { uri ->
-                uri?.let {
-                    libViewModel.addAndExtractBook(it)
+                if (uri != null) {
+                    libViewModel.addAndExtractBook(uri)
+                } else {
+                    TODO()
                 }
             },
         )

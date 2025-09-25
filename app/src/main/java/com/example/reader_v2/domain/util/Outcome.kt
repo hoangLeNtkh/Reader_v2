@@ -1,4 +1,4 @@
-package com.example.reader_v2.domain.utils
+package com.example.reader_v2.domain.util
 
 sealed class Outcome<out T, out E> {
     data class Success<out T>(
