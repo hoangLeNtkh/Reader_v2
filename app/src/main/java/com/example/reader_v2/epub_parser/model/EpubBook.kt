@@ -6,7 +6,7 @@ data class EpubBook(
     val author: String?,
     val description: String?,
     val chapters: List<Chapter>,
-    val coverImagePath: String?,
+    val coverPath: String?,
 ) {
     data class ManifestItem(
         val id: String,

@@ -36,7 +36,7 @@ class BookFileDataSource
 
             context.contentResolver.openInputStream(uri)!!.buffered().let { inputStream ->
                 bookFile.outputStream().use { outputStream ->
-	                inputStream.copyTo(outputStream)
+                    inputStream.copyTo(outputStream)
                 }
             }
 
