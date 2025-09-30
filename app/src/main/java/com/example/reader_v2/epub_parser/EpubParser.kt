@@ -101,7 +101,7 @@ class EpubParser
                         spine = spine,
                     )
 
-                val coverImagePath: String? =
+                val coverPath: String? =
                     manifestItems
                         .values
                         .firstOrNull {
@@ -109,12 +109,12 @@ class EpubParser
                         }?.hrefFullPath
 
                 EpubBook(
-	                fileName = title.asFileName(),
-	                title = title,
-	                author = author,
-	                description = description,
-	                chapters = chapters,
-	                coverImagePath = coverImagePath,
+                    fileName = title.asFileName(),
+                    title = title,
+                    author = author,
+                    description = description,
+                    chapters = chapters,
+                    coverPath = coverPath,
                 )
             }
     }

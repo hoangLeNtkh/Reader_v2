@@ -51,7 +51,7 @@ class BookRepositoryImpl
                         description = epubBook.description,
                         totalChapters = epubBook.chapters.size,
                         chapters = simpleChapters,
-                        coverPath = epubBook.coverImagePath,
+                        coverPath = epubBook.coverPath,
                         lastReadChapterIndex = 0,
                         lastReadPosition = 0f,
                         dateAdded = System.currentTimeMillis(),
