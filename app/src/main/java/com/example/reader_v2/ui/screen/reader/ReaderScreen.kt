@@ -1,4 +1,4 @@
-package com.example.reader_v2.presentation.screen.reader
+package com.example.reader_v2.ui.screen.reader
 
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Arrangement

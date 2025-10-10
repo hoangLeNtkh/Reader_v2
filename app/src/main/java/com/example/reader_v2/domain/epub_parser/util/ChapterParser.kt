@@ -1,6 +1,6 @@
-package com.example.reader_v2.epub_parser.util
+package com.example.reader_v2.domain.epub_parser.util
 
-import com.example.reader_v2.epub_parser.model.EpubBook
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 import com.fleeksoft.ksoup.nodes.Element
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -36,8 +36,7 @@ class ChapterParser
                         val tocEntry: EpubBook.TocEntry? = findTocEntryForChapter(tocEntries, manifestItemFullHref)
                         chapters.add(
                             EpubBook.Chapter(
-                                title = tocEntry?.chapterTitle ?: "Chapter ${chapters.size + 1}",
-                                fragmentLink = tocEntry?.chapterLink ?: manifestItemFullHref,
+                                title = tocEntry?.title ?: "Chapter ${chapters.size + 1}",
                                 filePath = manifestItemFullHref,
                             ),
                         )
@@ -64,7 +63,7 @@ class ChapterParser
             chapterHrefWithoutFragment: String,
         ): EpubBook.TocEntry? {
             for (entry in entries) {
-                if (entry.chapterLink
+                if (entry.link
                         .substringBefore('#')
                         .equals(chapterHrefWithoutFragment, ignoreCase = true)
                 ) {

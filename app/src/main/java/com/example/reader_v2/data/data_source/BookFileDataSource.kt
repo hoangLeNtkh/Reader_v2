@@ -2,7 +2,7 @@ package com.example.reader_v2.data.data_source
 
 import android.content.Context
 import android.net.Uri
-import com.example.reader_v2.epub_parser.util.getEntries
+import com.example.reader_v2.domain.epub_parser.util.getEntries
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.IOException
 import java.util.zip.ZipInputStream
 
 @Singleton

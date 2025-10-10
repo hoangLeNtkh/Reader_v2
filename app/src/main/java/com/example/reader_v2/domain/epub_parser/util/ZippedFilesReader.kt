@@ -1,6 +1,6 @@
-package com.example.reader_v2.epub_parser.util
+package com.example.reader_v2.domain.epub_parser.util
 
-import com.example.reader_v2.epub_parser.model.EpubFile
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubFile
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers

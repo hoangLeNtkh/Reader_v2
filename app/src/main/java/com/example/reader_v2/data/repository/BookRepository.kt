@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.Flow
 interface BookRepository {
     fun getAllBooks(): Flow<List<Book>>
 
-    suspend fun getBookById(bookId: String): Book?
+    suspend fun getBook(bookId: String): Book
 
     suspend fun addAndExtractBook(uri: Uri): String
 
-    fun getChapterUrl(
+    fun getFileUrl(
         bookId: String,
         chapterFilePath: String,
     ): String

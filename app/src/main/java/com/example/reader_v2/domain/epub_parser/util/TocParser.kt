@@ -1,7 +1,7 @@
-package com.example.reader_v2.epub_parser.util
+package com.example.reader_v2.domain.epub_parser.util
 
-import com.example.reader_v2.epub_parser.model.EpubBook
-import com.example.reader_v2.epub_parser.model.EpubFile
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubFile
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
@@ -16,8 +16,8 @@ class TocParser
     @Inject
     constructor() {
         suspend fun parse(
-            tocFile: EpubFile,
-            hrefRootPath: File,
+	        tocFile: EpubFile,
+	        hrefRootPath: File,
         ): List<EpubBook.TocEntry> =
             withContext(Dispatchers.Default) {
                 val rootPath = hrefRootPath.path
@@ -62,8 +62,8 @@ class TocParser
                 val fullHref =
                     if (href.isNotEmpty() && !href.startsWith(rootPath)) "$rootPath/$href" else href
                 return EpubBook.TocEntry(
-                    chapterTitle = title,
-                    chapterLink = fullHref,
+                    title = title,
+                    link = fullHref,
                     children = children,
                 )
             }
