@@ -133,8 +133,25 @@ class ReaderViewModel
         }
 
         fun navigateToNextChapter() {
+            val currentIndex = _uiState.value.currentChapterIndex
+            val chapterSize = _uiState.value.totalChapters
+
+            if (currentIndex < chapterSize - 1) {
+                val nextIndex = currentIndex + 1
+                loadChapter(nextIndex)
+            } else {
+                Log.d(TAG, "Already at the last chapter.")
+            }
         }
 
         fun navigateToPreviousChapter() {
+            val currentIndex = _uiState.value.currentChapterIndex
+
+            if ( currentIndex > 0) {
+                val previousIndex = currentIndex - 1
+                loadChapter(previousIndex)
+            } else {
+                Log.d(TAG, "Already at the first chapter.")
+            }
         }
     }
