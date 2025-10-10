@@ -1,4 +1,4 @@
-package com.example.reader_v2.presentation.screen.library
+package com.example.reader_v2.ui.screen.library
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.reader_v2.presentation.component.BookCard
+import com.example.reader_v2.ui.component.BookCard
 
 @Composable
 fun LibraryScreen(

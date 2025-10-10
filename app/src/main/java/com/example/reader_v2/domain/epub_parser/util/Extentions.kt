@@ -1,4 +1,4 @@
-package com.example.reader_v2.epub_parser.util
+package com.example.reader_v2.domain.epub_parser.util
 
 import java.io.File
 import java.net.URLDecoder

@@ -1,12 +1,12 @@
-package com.example.reader_v2.presentation.screen.reader
+package com.example.reader_v2.ui.screen.reader
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 import com.example.reader_v2.domain.model.Book
-import com.example.reader_v2.domain.model.SimpleChapter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +64,7 @@ class ReaderViewModel
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val book: Book? = repository.getBookById(bookId)
+                    val book: Book? = repository.getBook(bookId)
                     if (book == null) {
                         Log.e(TAG, "Book with ID $bookId not found.")
                         _uiState.update { it.copy(isLoading = false, error = "Book not found") }
@@ -107,8 +107,8 @@ class ReaderViewModel
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val chapterToLoad: SimpleChapter = book.chapters[chapterIndex]
-                    val chapterUrl = repository.getChapterUrl(book.id, chapterToLoad.filePath)
+                    val chapterToLoad: EpubBook.Chapter = book.chapters[chapterIndex]
+                    val chapterUrl = repository.getFileUrl(book.id, chapterToLoad.filePath)
 
                     _uiState.update {
                         it.copy(

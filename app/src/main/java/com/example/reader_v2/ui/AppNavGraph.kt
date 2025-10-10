@@ -1,11 +1,11 @@
-package com.example.reader_v2.presentation
+package com.example.reader_v2.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.reader_v2.presentation.screen.library.LibraryScreen
-import com.example.reader_v2.presentation.screen.reader.ReaderScreen
+import com.example.reader_v2.ui.screen.library.LibraryScreen
+import com.example.reader_v2.ui.screen.reader.ReaderScreen
 
 sealed class Screen(
     val route: String,

@@ -1,12 +1,12 @@
-package com.example.reader_v2.epub_parser.model
+package com.example.reader_v2.domain.epub_parser.epub_model
 
 data class EpubBook(
-    val fileName: String,
     val title: String,
     val author: String?,
     val description: String?,
-    val chapters: List<Chapter>,
     val coverPath: String?,
+    val chapters: List<Chapter>,
+    val toc: List<TocEntry>,
 ) {
     data class ManifestItem(
         val id: String,
@@ -16,14 +16,13 @@ data class EpubBook(
     )
 
     data class TocEntry(
-        val chapterTitle: String,
-        val chapterLink: String,
+        val title: String,
+        val link: String,
         val children: List<TocEntry>,
     )
 
     data class Chapter(
         val title: String,
-        val fragmentLink: String,
         val filePath: String,
     )
 }

@@ -1,6 +1,5 @@
-package com.example.reader_v2.presentation.component
+package com.example.reader_v2.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,30 +35,31 @@ fun BookCard(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(0.7f)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(0.7f),
         ) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(book.coverPath?.let { File(it) })
-                    .crossfade(true)
-                    .build(),
+                model =
+                    ImageRequest
+                        .Builder(LocalContext.current)
+                        .data(book.coverPath)
+                        .crossfade(true)
+                        .build(),
                 contentDescription = "Cover of ${book.title}",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-        text = book.title,
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Center,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.fillMaxWidth()
-    )
+//    Text(
+//        text = book.title,
+//        style = MaterialTheme.typography.bodyMedium,
+//        textAlign = TextAlign.Center,
+//        maxLines = 2,
+//        overflow = TextOverflow.Ellipsis,
+//        modifier = Modifier.fillMaxWidth(),
+//    )
 }

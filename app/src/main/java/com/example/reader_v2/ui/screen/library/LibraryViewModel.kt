@@ -1,11 +1,10 @@
-package com.example.reader_v2.presentation.screen.library
+package com.example.reader_v2.ui.screen.library
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
 import com.example.reader_v2.domain.model.Book
-import com.example.reader_v2.domain.util.Outcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted

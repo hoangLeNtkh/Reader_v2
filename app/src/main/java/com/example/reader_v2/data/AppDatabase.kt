@@ -7,14 +7,15 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.reader_v2.data.dao.BookDao
 import com.example.reader_v2.data.entity.BookEntity
-import com.example.reader_v2.data.util.Converters
+import com.example.reader_v2.data.util.ChapterListConverter
+import com.example.reader_v2.data.util.TocEntryListConverter
 
 @Database(
     entities = [BookEntity::class],
     version = 1,
     exportSchema = false,
 )
-@TypeConverters(Converters::class)
+@TypeConverters(ChapterListConverter::class, TocEntryListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
 

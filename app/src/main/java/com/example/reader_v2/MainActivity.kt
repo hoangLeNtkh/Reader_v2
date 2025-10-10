@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.reader_v2.presentation.AppNavGraph
+import com.example.reader_v2.ui.AppNavGraph
 import com.example.reader_v2.ui.theme.Readerv2Theme
 import dagger.hilt.android.AndroidEntryPoint
 

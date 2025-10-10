@@ -1,13 +1,12 @@
-package com.example.reader_v2.epub_parser
+package com.example.reader_v2.domain.epub_parser
 
-import com.example.reader_v2.epub_parser.model.EpubBook
-import com.example.reader_v2.epub_parser.model.EpubFile
-import com.example.reader_v2.epub_parser.util.ChapterParser
-import com.example.reader_v2.epub_parser.util.TocParser
-import com.example.reader_v2.epub_parser.util.ZippedFilesReader
-import com.example.reader_v2.epub_parser.util.asFileName
-import com.example.reader_v2.epub_parser.util.decodedUrl
-import com.example.reader_v2.epub_parser.util.findHrefFullPath
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
+import com.example.reader_v2.domain.epub_parser.epub_model.EpubFile
+import com.example.reader_v2.domain.epub_parser.util.ChapterParser
+import com.example.reader_v2.domain.epub_parser.util.TocParser
+import com.example.reader_v2.domain.epub_parser.util.ZippedFilesReader
+import com.example.reader_v2.domain.epub_parser.util.decodedUrl
+import com.example.reader_v2.domain.epub_parser.util.findHrefFullPath
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
@@ -17,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
+import kotlin.collections.get
 
 @Singleton
 class EpubParser
@@ -109,12 +109,12 @@ class EpubParser
                         }?.hrefFullPath
 
                 EpubBook(
-                    fileName = title.asFileName(),
                     title = title,
                     author = author,
                     description = description,
-                    chapters = chapters,
                     coverPath = coverPath,
+                    chapters = chapters,
+                    toc = tocEntries,
                 )
             }
     }

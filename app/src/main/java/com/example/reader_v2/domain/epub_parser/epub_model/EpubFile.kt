@@ -1,4 +1,4 @@
-package com.example.reader_v2.epub_parser.model
+package com.example.reader_v2.domain.epub_parser.epub_model
 
 data class EpubFile(
     val entryPath: String,
