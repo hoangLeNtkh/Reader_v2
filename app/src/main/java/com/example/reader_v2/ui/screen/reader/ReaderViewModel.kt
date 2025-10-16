@@ -26,6 +26,7 @@ data class ReaderUiState(
     val currentReadPosition: Float = 0f,
     val canNavigateNext: Boolean = false,
     val canNavigatePrevious: Boolean = false,
+    val isTocVisible: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -147,11 +148,32 @@ class ReaderViewModel
         fun navigateToPreviousChapter() {
             val currentIndex = _uiState.value.currentChapterIndex
 
-            if ( currentIndex > 0) {
+            if (currentIndex > 0) {
                 val previousIndex = currentIndex - 1
                 loadChapter(previousIndex)
             } else {
                 Log.d(TAG, "Already at the first chapter.")
+            }
+        }
+
+        fun toggleTocVisibility() {
+            _uiState.update { it.copy(isTocVisible = !it.isTocVisible) }
+        }
+
+        fun navigateToChapterByToc(tocEntry: EpubBook.TocEntry) {
+            val book = uiState.value.currentBook ?: return
+            val chapterIndex =
+                book.chapters.indexOfFirst {
+                    val normalizedChapterPath = it.filePath.removePrefix("./")
+                    val normalizedTocLink = tocEntry.link.removePrefix("./")
+                    normalizedChapterPath == normalizedTocLink
+                }
+
+            if (chapterIndex != -1) {
+                loadChapter(chapterIndex)
+                toggleTocVisibility() // Hide TOC after selection
+            } else {
+                Log.w(TAG, "Chapter not found for TOC entry: ${tocEntry.title} with link ${tocEntry.link}")
             }
         }
     }

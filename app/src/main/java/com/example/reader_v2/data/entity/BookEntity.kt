@@ -13,15 +13,12 @@ data class BookEntity(
     val author: String?,
     val description: String?,
     val totalChapters: Int,
-
     val coverPath: String?,
     val chapters: List<EpubBook.Chapter>,
     val toc: List<EpubBook.TocEntry>,
-
     val lastReadChapterIndex: Int,
     val lastReadPosition: Float,
     val readProgress: Float,
-
     val dateAdded: Long,
     val lastReadDate: Long,
 )

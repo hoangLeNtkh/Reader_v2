@@ -6,17 +6,17 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class TocEntryListConverter {
-	private val gson = Gson()
+    private val gson = Gson()
 
-	@TypeConverter
-	fun convertTocEntryListToJson(chapters: List<EpubBook.TocEntry>): String = gson.toJson(chapters)
+    @TypeConverter
+    fun convertTocEntryListToJson(chapters: List<EpubBook.TocEntry>): String = gson.toJson(chapters)
 
-	@TypeConverter
-	fun convertJsonToTocEntryList(chaptersJson: String?): List<EpubBook.TocEntry>? {
-		if (chaptersJson.isNullOrEmpty()) {
-			return emptyList()
-		}
-		val listType = object : TypeToken<List<EpubBook.TocEntry>>() {}.type
-		return gson.fromJson(chaptersJson, listType)
-	}
+    @TypeConverter
+    fun convertJsonToTocEntryList(chaptersJson: String?): List<EpubBook.TocEntry>? {
+        if (chaptersJson.isNullOrEmpty()) {
+            return emptyList()
+        }
+        val listType = object : TypeToken<List<EpubBook.TocEntry>>() {}.type
+        return gson.fromJson(chaptersJson, listType)
+    }
 }
