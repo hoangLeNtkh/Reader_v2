@@ -16,8 +16,8 @@ class TocParser
     @Inject
     constructor() {
         suspend fun parse(
-	        tocFile: EpubFile,
-	        hrefRootPath: File,
+            tocFile: EpubFile,
+            hrefRootPath: File,
         ): List<EpubBook.TocEntry> =
             withContext(Dispatchers.Default) {
                 val rootPath = hrefRootPath.path

@@ -4,9 +4,9 @@ import android.net.Uri
 import com.example.reader_v2.data.dao.BookDao
 import com.example.reader_v2.data.data_source.BookFileDataSource
 import com.example.reader_v2.data.entity.BookEntity
-import com.example.reader_v2.domain.model.Book
 import com.example.reader_v2.domain.epub_parser.EpubParser
 import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
+import com.example.reader_v2.domain.model.Book
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -23,11 +23,9 @@ class BookRepositoryImpl
         private val epubParser: EpubParser,
         private val bookDao: BookDao,
     ) : BookRepository {
-        override fun getAllBooks(): Flow<List<Book>> =
-            bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
+        override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
-        override suspend fun getBook(bookId: String): Book =
-            bookDao.getBookById(bookId).toModel()
+        override suspend fun getBook(bookId: String): Book = bookDao.getBookById(bookId).toModel()
 
         override suspend fun addAndExtractBook(uri: Uri): String =
             withContext(Dispatchers.IO) {
@@ -37,9 +35,10 @@ class BookRepositoryImpl
 
                 fileDataSource.extractEpub(bookFile, bookId)
 
-                val fullCoverPath = epubBook.coverPath?.let { relativePath ->
-                    fileDataSource.getChapterFileUrl(bookId, relativePath)
-                }
+                val fullCoverPath =
+                    epubBook.coverPath?.let { relativePath ->
+                        fileDataSource.getChapterFileUrl(bookId, relativePath)
+                    }
 
                 val bookEntity =
                     BookEntity(
@@ -70,19 +69,19 @@ class BookRepositoryImpl
 
         private fun BookEntity.toModel(): Book =
             Book(
-	            id = id,
-	            filePath = filePath,
-	            title = title,
-	            author = author,
-	            description = description,
-	            totalChapters = totalChapters,
+                id = id,
+                filePath = filePath,
+                title = title,
+                author = author,
+                description = description,
+                totalChapters = totalChapters,
                 coverPath = coverPath,
                 chapters = chapters,
                 toc = toc,
                 lastReadChapterIndex = lastReadChapterIndex,
-	            lastReadPosition = lastReadPosition,
+                lastReadPosition = lastReadPosition,
                 readProgress = readProgress,
                 dateAdded = dateAdded,
-	            lastReadDate = lastReadDate,
+                lastReadDate = lastReadDate,
             )
     }
