@@ -29,6 +29,7 @@ data class ReaderUiState(
     val isTocVisible: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
+    val pendingAnchor: String? = null,
 )
 
 @HiltViewModel
@@ -162,18 +163,29 @@ class ReaderViewModel
 
         fun navigateToChapterByToc(tocEntry: EpubBook.TocEntry) {
             val book = uiState.value.currentBook ?: return
+
+            val parts = tocEntry.link.split("#")
+            val linkPath = parts[0].removePrefix("./")
+            val anchor = if (parts.size > 1) parts[1] else null
+
             val chapterIndex =
                 book.chapters.indexOfFirst {
-                    val normalizedChapterPath = it.filePath.removePrefix("./")
-                    val normalizedTocLink = tocEntry.link.removePrefix("./")
-                    normalizedChapterPath == normalizedTocLink
+                    it.filePath.removePrefix("./") == linkPath
                 }
 
             if (chapterIndex != -1) {
-                loadChapter(chapterIndex)
-                toggleTocVisibility() // Hide TOC after selection
-            } else {
-                Log.w(TAG, "Chapter not found for TOC entry: ${tocEntry.title} with link ${tocEntry.link}")
+                // Update state with the pending anchor
+                _uiState.update { it.copy(pendingAnchor = anchor) }
+
+                if (chapterIndex == uiState.value.currentChapterIndex) {
+                } else {
+                    loadChapter(chapterIndex)
+                }
+                toggleTocVisibility()
             }
+        }
+
+        fun onAnchorHandled() {
+            _uiState.update { it.copy(pendingAnchor = null) }
         }
     }

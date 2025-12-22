@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -87,8 +88,12 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                 },
                 update = { webView ->
                     if (currentChapterUrl.isNotEmpty() && webView.url != currentChapterUrl) {
-                        Log.d("ReaderScreen", "Loading URL: $currentChapterUrl")
                         webView.loadUrl(currentChapterUrl)
+                    }
+
+                    uiState.pendingAnchor?.let { anchor ->
+                        webView.evaluateJavascript("document.getElementById('$anchor')?.scrollIntoView()", null)
+                        readerViewModel.onAnchorHandled()
                     }
                 },
             )
@@ -239,16 +244,38 @@ fun TocItem(
     onItemSelected: (EpubBook.TocEntry) -> Unit,
     level: Int = 0,
 ) {
+    val isJumpable = entry.link.isNotBlank()
+
     Column {
         Text(
             text = entry.title,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .clickable { onItemSelected(entry) }
-                    .padding(start = (16 * (level + 1)).dp, top = 12.dp, bottom = 12.dp, end = 16.dp),
+                    .clickable(enabled = isJumpable) { onItemSelected(entry) }
+                    .padding(
+                        start = (16 * (level + 1)).dp,
+                        top = 12.dp,
+                        bottom = 12.dp,
+                        end = 16.dp,
+                    ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            color =
+                if (isJumpable) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+            style =
+                MaterialTheme.typography.bodyLarge.copy(
+                    textDecoration =
+                        if (isJumpable) {
+                            TextDecoration.Underline
+                        } else {
+                            TextDecoration.None
+                        },
+                ),
         )
         if (entry.children.isNotEmpty()) {
             entry.children.forEach { child ->
