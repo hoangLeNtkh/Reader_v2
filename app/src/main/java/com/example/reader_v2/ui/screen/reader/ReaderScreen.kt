@@ -1,6 +1,5 @@
 package com.example.reader_v2.ui.screen.reader
 
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.webkit.WebView
@@ -49,7 +48,6 @@ import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 @Composable
 fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
     val uiState by readerViewModel.uiState.collectAsState()
-    val currentChapterUrl = uiState.currentChapterFileUrl
     var showBars by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -69,6 +67,27 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                         settings.allowFileAccess = true
                         settings.allowContentAccess = true
 
+                        webViewClient =
+                            object : android.webkit.WebViewClient() {
+                                override fun onPageFinished(
+                                    view: WebView?,
+                                    url: String?,
+                                ) {
+                                    super.onPageFinished(view, url)
+
+                                    val anchor = readerViewModel.uiState.value.pendingAnchor
+                                    if (anchor != null) {
+                                        view?.postDelayed({
+                                            view.evaluateJavascript(
+                                                "document.getElementById('$anchor')?.scrollIntoView({behavior: 'smooth'});",
+                                                null,
+                                            )
+                                            readerViewModel.onAnchorHandled()
+                                        }, 200) // Slightly longer delay for safety on heavy EPUB files
+                                    }
+                                }
+                            }
+
                         val gestureDetector =
                             GestureDetector(
                                 context,
@@ -79,6 +98,7 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                                     }
                                 },
                             )
+
                         setOnTouchListener { _, event ->
                             gestureDetector.onTouchEvent(event)
                             // Return false to allow the WebView to handle other events like scrolling
@@ -87,12 +107,17 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                     }
                 },
                 update = { webView ->
-                    if (currentChapterUrl.isNotEmpty() && webView.url != currentChapterUrl) {
-                        webView.loadUrl(currentChapterUrl)
+                    // 1. Handle Page Loading
+                    if (uiState.currentChapterFileUrl.isNotEmpty() && webView.url != uiState.currentChapterFileUrl) {
+                        webView.loadUrl(uiState.currentChapterFileUrl)
                     }
-
-                    uiState.pendingAnchor?.let { anchor ->
-                        webView.evaluateJavascript("document.getElementById('$anchor')?.scrollIntoView()", null)
+                    // 2. Handle Jumping within the SAME page
+                    else if (uiState.pendingAnchor != null && webView.url == uiState.currentChapterFileUrl) {
+                        // If we are already on the page, jump immediately
+                        webView.evaluateJavascript(
+                            "document.getElementById('${uiState.pendingAnchor}')?.scrollIntoView({behavior: 'smooth'});",
+                            null,
+                        )
                         readerViewModel.onAnchorHandled()
                     }
                 },
