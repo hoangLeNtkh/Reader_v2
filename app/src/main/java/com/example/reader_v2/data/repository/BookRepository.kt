@@ -15,4 +15,10 @@ interface BookRepository {
         bookId: String,
         chapterFilePath: String,
     ): String
+
+    suspend fun updateReadingProgress(
+        bookId: String,
+        chapterIndex: Int,
+        position: Float,
+    )
 }
