@@ -21,4 +21,14 @@ interface BookDao {
 
     @Delete
     fun deleteBook(book: BookEntity)
+
+    @Query(
+        "UPDATE books SET lastReadChapterIndex = :chapterIndex, lastReadPosition = :position, lastReadDate = :timestamp WHERE id = :bookId",
+    )
+    fun updateReadingProgress(
+        bookId: String,
+        chapterIndex: Int,
+        position: Float,
+        timestamp: Long = System.currentTimeMillis(), // Automatically updates the "Last Read" time
+    )
 }

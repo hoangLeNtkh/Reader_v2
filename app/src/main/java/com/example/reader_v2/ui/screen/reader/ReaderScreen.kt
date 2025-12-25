@@ -75,18 +75,24 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                                 ) {
                                     super.onPageFinished(view, url)
 
-                                    val anchor = readerViewModel.uiState.value.pendingAnchor
-                                    if (anchor != null) {
-                                        view?.postDelayed({
-                                            view.evaluateJavascript(
-                                                "document.getElementById('$anchor')?.scrollIntoView({behavior: 'smooth'});",
-                                                null,
-                                            )
-                                            readerViewModel.onAnchorHandled()
-                                        }, 200) // Slightly longer delay for safety on heavy EPUB files
-                                    }
+                                    postDelayed({
+                                        uiState.chapterContent?.target?.let { view?.executeScroll(it) }
+                                    }, 300)
                                 }
                             }
+
+                        setOnScrollChangeListener { v, _, scrollY, _, _ ->
+                            val webView = v as WebView
+                            val density = webView.resources.displayMetrics.density
+                            val totalContentHeight = webView.contentHeight.toFloat() * density
+                            val viewportHeight = webView.height.toFloat()
+                            val maxScrollY = totalContentHeight - viewportHeight
+
+                            if (maxScrollY > 0) {
+                                val progress = (scrollY.toFloat() / maxScrollY).coerceIn(0f, 1f)
+                                readerViewModel.updateReadPosition(progress)
+                            }
+                        }
 
                         val gestureDetector =
                             GestureDetector(
@@ -98,27 +104,19 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                                     }
                                 },
                             )
-
                         setOnTouchListener { _, event ->
                             gestureDetector.onTouchEvent(event)
-                            // Return false to allow the WebView to handle other events like scrolling
                             false
                         }
                     }
                 },
                 update = { webView ->
-                    // 1. Handle Page Loading
-                    if (uiState.currentChapterFileUrl.isNotEmpty() && webView.url != uiState.currentChapterFileUrl) {
-                        webView.loadUrl(uiState.currentChapterFileUrl)
-                    }
-                    // 2. Handle Jumping within the SAME page
-                    else if (uiState.pendingAnchor != null && webView.url == uiState.currentChapterFileUrl) {
-                        // If we are already on the page, jump immediately
-                        webView.evaluateJavascript(
-                            "document.getElementById('${uiState.pendingAnchor}')?.scrollIntoView({behavior: 'smooth'});",
-                            null,
-                        )
-                        readerViewModel.onAnchorHandled()
+                    uiState.chapterContent?.let { content ->
+                        if (webView.url != content.url) {
+                            webView.loadUrl(content.url)
+                        } else if (content.target is ScrollTarget.Anchor) {
+                            webView.executeScroll(content.target)
+                        }
                     }
                 },
             )

@@ -67,6 +67,20 @@ class BookRepositoryImpl
             chapterFilePath: String,
         ): String = fileDataSource.getChapterFileUrl(bookId, chapterFilePath)
 
+        override suspend fun updateReadingProgress(
+            bookId: String,
+            chapterIndex: Int,
+            position: Float,
+        ) {
+            withContext(Dispatchers.IO) {
+                bookDao.updateReadingProgress(
+                    bookId = bookId,
+                    chapterIndex = chapterIndex,
+                    position = position,
+                )
+            }
+        }
+
         private fun BookEntity.toModel(): Book =
             Book(
                 id = id,
