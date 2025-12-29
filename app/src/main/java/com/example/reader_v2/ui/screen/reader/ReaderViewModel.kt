@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
+import com.example.reader_v2.data.repository.SettingsRepository
 import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 import com.example.reader_v2.domain.model.Book
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +40,7 @@ class ReaderViewModel
     @Inject
     constructor(
         private val repository: BookRepository,
+        private val settingsRepository: SettingsRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(ReaderUiState())
@@ -50,6 +52,7 @@ class ReaderViewModel
 
         init {
             loadBookContent()
+            observeSettings()
         }
 
         override fun onCleared() {
@@ -75,6 +78,14 @@ class ReaderViewModel
                     chapterIndex = state.currentChapterIndex,
                     position = state.currentReadPosition,
                 )
+            }
+        }
+
+        private fun observeSettings() {
+            viewModelScope.launch {
+                settingsRepository.readerSettings.collect { savedSettings ->
+                    _uiState.update { it.copy(settings = savedSettings) }
+                }
             }
         }
 
@@ -223,5 +234,9 @@ class ReaderViewModel
 
         fun updateReaderSettings(newSettings: ReaderSettings) {
             _uiState.update { it.copy(settings = newSettings) }
+
+            viewModelScope.launch {
+                settingsRepository.updateSettings(newSettings)
+            }
         }
     }
