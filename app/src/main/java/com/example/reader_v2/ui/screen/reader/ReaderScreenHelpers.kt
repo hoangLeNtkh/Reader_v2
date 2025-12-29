@@ -38,20 +38,20 @@ fun WebView.executeScroll(target: ScrollTarget) {
 
 /** Handling Webview settings */
 data class ReaderSettings(
-	val fontSize: Int = 18,
-	val fontFamily: String = "serif",
-	val lineHeight: Float = 1.5f,
-	val theme: ReaderTheme = ReaderTheme.Light,
-	val horizontalMargin: Int = 16,
+    val fontSize: Int = 18,
+    val fontFamily: String = "serif",
+    val lineHeight: Float = 1.5f,
+    val theme: ReaderTheme = ReaderTheme.Light,
+    val horizontalMargin: Int = 16,
 )
 
 enum class ReaderTheme(
-	val backgroundColor: String,
-	val textColor: String,
+    val backgroundColor: String,
+    val textColor: String,
 ) {
-	Light("#FFFFFF", "#121212"),
-	Dark("#121212", "#E0E0E0"),
-	Sepia("#F4ECD8", "#5B4636"),
+    Light("#FFFFFF", "#121212"),
+    Dark("#121212", "#E0E0E0"),
+    Sepia("#F4ECD8", "#5B4636"),
 }
 
 fun WebView.applyReaderSettings(settings: ReaderSettings) {
