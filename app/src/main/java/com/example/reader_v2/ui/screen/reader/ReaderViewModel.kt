@@ -28,6 +28,8 @@ data class ReaderUiState(
     val canNavigateNext: Boolean = false,
     val canNavigatePrevious: Boolean = false,
     val isTocVisible: Boolean = false,
+    val settings: ReaderSettings = ReaderSettings(),
+    val isSettingsVisible: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -213,5 +215,13 @@ class ReaderViewModel
                     _uiState.update { it.copy(currentReadPosition = position) }
                     saveReadingProgress()
                 }
+        }
+
+        fun toggleSettingsVisibility() {
+            _uiState.update { it.copy(isSettingsVisible = !it.isSettingsVisible) }
+        }
+
+        fun updateReaderSettings(newSettings: ReaderSettings) {
+            _uiState.update { it.copy(settings = newSettings) }
         }
     }
