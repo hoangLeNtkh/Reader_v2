@@ -104,12 +104,25 @@ class EpubParser
                         spine = spine,
                     )
 
-                val coverPath: String? =
-                    manifestItems
-                        .values
-                        .firstOrNull {
-                            it.properties.contains("cover")
-                        }?.hrefFullPath
+                var coverPath: String? =
+                    manifestItems.values
+                        .firstOrNull { it.properties.contains("cover-image") }
+                        ?.hrefFullPath
+                if (coverPath == null) {
+                    val coverId = metadata.selectFirst("meta[name=cover]")?.attr("content")
+                    if (coverId != null) {
+                        coverPath = manifestItems[coverId]?.hrefFullPath
+                    }
+                }
+                if (coverPath == null) {
+                    coverPath =
+                        manifestItems.values
+                            .firstOrNull {
+                                val id = it.id.lowercase()
+                                val href = it.hrefFullPath.lowercase()
+                                id.contains("cover") || href.contains("cover.jpg") || href.contains("cover.jpeg")
+                            }?.hrefFullPath
+                }
 
                 EpubBook(
                     title = title,
