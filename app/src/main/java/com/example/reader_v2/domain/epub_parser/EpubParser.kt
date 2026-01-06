@@ -79,17 +79,20 @@ class EpubParser
                             )
                         }.associateBy { it.id }
 
-                val tocFilePath: String? =
-                    manifestItems
-                        .values
-                        .firstOrNull {
-                            it.properties.contains("nav") || it.properties.contains("toc")
-                        }?.hrefFullPath
+                val tocItem =
+                    manifestItems.values.firstOrNull { it.properties.contains("nav") }
+                        ?: manifestItems.values.firstOrNull { it.mediaType == "application/x-dtbncx+xml" }
+                        ?: manifestItems.values.firstOrNull { it.id == "ncx" || it.id == "toc" }
+                val tocFilePath = tocItem?.hrefFullPath
                 val tocFile: EpubFile =
                     files[tocFilePath]
-                        ?: throw FileNotFoundException("Toc file missing")
-                val tocEntries: List<EpubBook.TocEntry> = tocParser.parse(tocFile, hrefRootPath)
-
+                        ?: throw FileNotFoundException("Toc file missing or not found in manifest")
+                val tocEntries: List<EpubBook.TocEntry> =
+                    tocParser.parse(
+                        tocFile = tocFile,
+                        hrefRootPath = hrefRootPath,
+                        isNcx = tocItem?.mediaType == "application/x-dtbncx+xml",
+                    )
                 val spine: Element =
                     opfDoc.selectFirst("spine")
                         ?: throw NoSuchElementException("Spine element not found")
