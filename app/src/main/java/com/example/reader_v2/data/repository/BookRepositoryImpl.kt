@@ -13,23 +13,30 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 @Singleton
 class BookRepositoryImpl
     @Inject
     constructor(
+        @dagger.hilt.android.qualifiers.ApplicationContext
+        private val context: android.content.Context,
         private val fileDataSource: BookFileDataSource,
         private val epubParser: EpubParser,
         private val bookDao: BookDao,
     ) : BookRepository {
         override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList -> bookList.map { it.toModel() } }
 
-        override suspend fun getBook(bookId: String): Book = bookDao.getBookById(bookId).toModel()
+        override suspend fun getBook(bookId: String): Book = bookDao.getBookById(bookId)!!.toModel()
 
         override suspend fun addAndExtractBook(uri: Uri): String =
             withContext(Dispatchers.IO) {
-                val bookId = UUID.randomUUID().toString()
+                val bookId = calculateChecksum(uri)
+
+                val existingBook = bookDao.getBookById(bookId)
+                if (existingBook != null) {
+                    return@withContext existingBook.title
+                }
+
                 val bookFile = fileDataSource.saveBookToAppStorage(uri, bookId)
                 val epubBook: EpubBook = epubParser.parse(bookFile)
 
@@ -79,6 +86,19 @@ class BookRepositoryImpl
                     position = position,
                 )
             }
+        }
+
+        private fun calculateChecksum(uri: Uri): String {
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                val buffer = ByteArray(8192)
+                var bytesRead = input.read(buffer)
+                while (bytesRead != -1) {
+                    digest.update(buffer, 0, bytesRead)
+                    bytesRead = input.read(buffer)
+                }
+            }
+            return digest.digest().joinToString("") { "%02x".format(it) }
         }
 
         private fun BookEntity.toModel(): Book =
