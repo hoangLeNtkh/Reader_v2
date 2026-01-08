@@ -21,4 +21,6 @@ interface BookRepository {
         chapterIndex: Int,
         position: Float,
     )
+
+    suspend fun deleteBook(bookId: String)
 }

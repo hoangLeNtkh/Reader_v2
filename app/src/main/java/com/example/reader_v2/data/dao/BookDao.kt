@@ -31,4 +31,7 @@ interface BookDao {
         position: Float,
         timestamp: Long = System.currentTimeMillis(), // Automatically updates the "Last Read" time
     )
+
+    @Query("DELETE FROM books WHERE id = :bookId")
+    suspend fun deleteBookById(bookId: String)
 }

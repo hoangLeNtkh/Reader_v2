@@ -76,4 +76,17 @@ class BookFileDataSource
         }
 
         fun getExtractedBookPath(bookId: String): File = File(extractedBooksDir, bookId)
+
+        fun deleteBook(bookId: String) {
+            val extractedDir = File(context.filesDir, "extracted/$bookId")
+            if (extractedDir.exists()) {
+                extractedDir.deleteRecursively()
+            }
+
+            // 2. Delete the original saved .epub file
+            val epubFile = File(context.filesDir, "books/$bookId.epub")
+            if (epubFile.exists()) {
+                epubFile.delete()
+            }
+        }
     }
