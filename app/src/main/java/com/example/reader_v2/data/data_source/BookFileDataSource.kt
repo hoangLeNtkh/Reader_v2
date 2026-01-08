@@ -78,7 +78,7 @@ class BookFileDataSource
         fun getExtractedBookPath(bookId: String): File = File(extractedBooksDir, bookId)
 
         fun deleteBook(bookId: String) {
-            val extractedDir = File(context.filesDir, "extracted/$bookId")
+            val extractedDir = File(context.filesDir, "extracted_books/$bookId")
             if (extractedDir.exists()) {
                 extractedDir.deleteRecursively()
             }

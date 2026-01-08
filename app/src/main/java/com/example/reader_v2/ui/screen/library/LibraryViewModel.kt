@@ -35,4 +35,10 @@ class LibraryViewModel
                 }
             }
         }
+
+        fun deleteBook(bookId: String) {
+            viewModelScope.launch {
+                repository.deleteBook(bookId)
+            }
+        }
     }
