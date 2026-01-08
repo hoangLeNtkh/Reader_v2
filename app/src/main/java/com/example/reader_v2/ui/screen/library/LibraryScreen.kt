@@ -86,7 +86,8 @@ fun LibraryScreen(
                 ) { book ->
                     BookCard(
                         book = book,
-                        onClick = { onBookClick(book.id) },
+                        onBookClick = { onBookClick(book.id) },
+                        onDeleteConfirm = { libViewModel.deleteBook(it) },
                     )
                 }
             }
