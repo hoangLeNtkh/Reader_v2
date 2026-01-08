@@ -101,6 +101,13 @@ class BookRepositoryImpl
             return digest.digest().joinToString("") { "%02x".format(it) }
         }
 
+        override suspend fun deleteBook(bookId: String) {
+            withContext(Dispatchers.IO) {
+                bookDao.deleteBookById(bookId)
+                fileDataSource.deleteBook(bookId)
+            }
+        }
+
         private fun BookEntity.toModel(): Book =
             Book(
                 id = id,
