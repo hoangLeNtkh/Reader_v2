@@ -7,8 +7,10 @@ import com.example.reader_v2.data.repository.BookRepository
 import com.example.reader_v2.domain.model.Book
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -25,13 +27,19 @@ class LibraryViewModel
                 initialValue = emptyList(),
             )
 
+        private val _isLoading = MutableStateFlow(false)
+        val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
         fun addAndExtractBook(uri: Uri) {
             viewModelScope.launch {
+                _isLoading.value = true
                 try {
                     val bookId = repository.addAndExtractBook(uri)
                     println("Successfully added book with ID: $bookId")
                 } catch (e: Exception) {
                     println("Error adding book: ${e.message}")
+                } finally {
+                    _isLoading.value = false
                 }
             }
         }
