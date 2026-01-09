@@ -78,7 +78,6 @@ fun BookCard(
                     ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
-            // Your existing Book UI (Cover, Title, etc.)
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceEvenly,
