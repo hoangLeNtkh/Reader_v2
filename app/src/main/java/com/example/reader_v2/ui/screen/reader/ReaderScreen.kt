@@ -109,7 +109,15 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                                 context,
                                 object : GestureDetector.SimpleOnGestureListener() {
                                     override fun onSingleTapUp(e: MotionEvent): Boolean {
-                                        showBars = !showBars
+                                        val webViewWidth = width
+                                        val leftEdge = webViewWidth * 0.25f
+                                        val rightEdge = webViewWidth * 0.75f
+
+                                        when {
+                                            e.x > rightEdge -> readerViewModel.navigateToNextChapter()
+                                            e.x < leftEdge -> readerViewModel.navigateToPreviousChapter()
+                                            else -> showBars = !showBars
+                                        }
                                         return true
                                     }
                                 },
@@ -126,7 +134,7 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                     uiState.chapterContent?.let { content ->
                         if (webView.url != content.url) {
                             webView.loadUrl(content.url)
-                        } else if (content.target is ScrollTarget.Anchor) {
+                        } else {
                             webView.executeScroll(content.target)
                         }
                     }
@@ -367,7 +375,10 @@ fun SettingsOverlay(
                     value = settings.fontSize.toFloat(),
                     onValueChange = { onSettingsChange(settings.copy(fontSize = it.toInt())) },
                     valueRange = 12f..36f,
-                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp),
                 )
                 Text("A", style = MaterialTheme.typography.titleLarge)
             }
