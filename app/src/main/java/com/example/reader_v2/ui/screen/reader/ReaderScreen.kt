@@ -1,5 +1,6 @@
 package com.example.reader_v2.ui.screen.reader
 
+import android.annotation.SuppressLint
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.webkit.WebView
@@ -7,9 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,10 +53,19 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 
+@SuppressLint("JavascriptInterface")
 @Composable
 fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
     val uiState by readerViewModel.uiState.collectAsState()
     var showBars by remember { mutableStateOf(false) }
+    var isContentReady by remember { mutableStateOf(false) }
+    val jsInterface =
+        remember {
+            JavaScriptInterface(
+                handleJsStateChange = { json -> readerViewModel.handleJsStateChange(json) },
+                handleJsEdgeTap = { direction -> readerViewModel.handleJsEdgeTap(direction) },
+            )
+        }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -68,41 +77,56 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                     .padding(innerPadding),
         ) {
             AndroidView(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().alpha(if (isContentReady) 1f else 0f),
                 factory = { context ->
                     WebView(context).apply {
                         settings.javaScriptEnabled = true
                         settings.allowFileAccess = true
                         settings.allowContentAccess = true
+                        isVerticalScrollBarEnabled = false
+                        isHorizontalScrollBarEnabled = false
+                        addJavascriptInterface(jsInterface, "AndroidBridge")
 
                         webViewClient =
                             object : android.webkit.WebViewClient() {
+                                override fun onPageStarted(
+                                    view: WebView?,
+                                    url: String?,
+                                    favicon: android.graphics.Bitmap?,
+                                ) {
+                                    super.onPageStarted(view, url, favicon)
+                                    isContentReady = false
+                                }
+
                                 override fun onPageFinished(
                                     view: WebView?,
                                     url: String?,
                                 ) {
                                     super.onPageFinished(view, url)
+                                    val script =
+                                        context.resources
+                                            .openRawResource(com.example.reader_v2.R.raw.pagination)
+                                            .bufferedReader()
+                                            .use { it.readText() }
 
-                                    view?.applyReaderSettings(readerViewModel.uiState.value.settings)
+                                    view?.evaluateJavascript(script, null)
 
                                     postDelayed({
-                                        uiState.chapterContent?.target?.let { view?.executeScroll(it) }
-                                    }, 300)
+                                        view?.applyReaderSettings(uiState.settings)
+
+                                        val progress = uiState.currentReadPosition
+                                        val preferEnd = uiState.loadLastPage
+
+                                        view?.evaluateJavascript("setupAndGoTo($progress, $preferEnd)") {
+                                            isContentReady = true
+
+                                            if (preferEnd) {
+                                                readerViewModel.onChapterLoadComplete()
+                                            }
+                                        }
+                                    }, 50)
                                 }
                             }
-
-                        setOnScrollChangeListener { v, _, scrollY, _, _ ->
-                            val webView = v as WebView
-                            val density = webView.resources.displayMetrics.density
-                            val totalContentHeight = webView.contentHeight.toFloat() * density
-                            val viewportHeight = webView.height.toFloat()
-                            val maxScrollY = totalContentHeight - viewportHeight
-
-                            if (maxScrollY > 0) {
-                                val progress = (scrollY.toFloat() / maxScrollY).coerceIn(0f, 1f)
-                                readerViewModel.updateReadPosition(progress)
-                            }
-                        }
 
                         val gestureDetector =
                             GestureDetector(
@@ -114,14 +138,15 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                                         val rightEdge = webViewWidth * 0.75f
 
                                         when {
-                                            e.x > rightEdge -> readerViewModel.navigateToNextChapter()
-                                            e.x < leftEdge -> readerViewModel.navigateToPreviousChapter()
+                                            e.x > rightEdge -> evaluateJavascript("goToNextPage()", null)
+                                            e.x < leftEdge -> evaluateJavascript("goToPreviousPage()", null)
                                             else -> showBars = !showBars
                                         }
                                         return true
                                     }
                                 },
                             )
+
                         setOnTouchListener { _, event ->
                             gestureDetector.onTouchEvent(event)
                             false
@@ -129,17 +154,20 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                     }
                 },
                 update = { webView ->
-                    webView.applyReaderSettings(uiState.settings)
-
                     uiState.chapterContent?.let { content ->
                         if (webView.url != content.url) {
                             webView.loadUrl(content.url)
-                        } else {
-                            webView.executeScroll(content.target)
                         }
                     }
                 },
             )
+
+            AnimatedVisibility(
+                visible = !isContentReady,
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                CircularProgressIndicator()
+            }
 
             AnimatedVisibility(
                 visible = showBars,
@@ -151,19 +179,6 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                     onTocClick = { readerViewModel.toggleTocVisibility() },
                     onSettingsClick = { readerViewModel.toggleSettingsVisibility() },
                     onBackClick = { /* TODO: Navigate back */ },
-                )
-            }
-
-            AnimatedVisibility(
-                visible = showBars,
-                modifier = Modifier.align(Alignment.BottomCenter),
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it }),
-            ) {
-                ReaderBottomBar(
-                    uiState = uiState,
-                    onPreviousClick = { readerViewModel.navigateToPreviousChapter() },
-                    onNextClick = { readerViewModel.navigateToNextChapter() },
                 )
             }
 
@@ -236,39 +251,6 @@ fun ReaderTopBar(
 }
 
 @Composable
-fun ReaderBottomBar(
-    uiState: ReaderUiState,
-    onPreviousClick: () -> Unit,
-    onNextClick: () -> Unit,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f),
-        shadowElevation = 8.dp,
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Button(
-                onClick = onPreviousClick,
-                enabled = uiState.canNavigatePrevious,
-            ) {
-                Text("Previous")
-            }
-            Text("Chapter ${uiState.currentChapterIndex + 1} / ${uiState.totalChapters}")
-            Button(
-                onClick = onNextClick,
-                enabled = uiState.canNavigateNext,
-            ) {
-                Text("Next")
-            }
-        }
-    }
-}
-
-@Composable
 fun TableOfContentsDropdown(
     toc: List<EpubBook.TocEntry>,
     onItemSelected: (EpubBook.TocEntry) -> Unit,
@@ -288,7 +270,6 @@ fun TableOfContentsDropdown(
                     .fillMaxHeight()
                     .align(Alignment.CenterEnd)
                     .clickable(enabled = false) {},
-            // Prevent background click through
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 8.dp,
         ) {

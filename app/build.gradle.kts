@@ -78,7 +78,7 @@ dependencies {
 	implementation(libs.androidx.webkit)
 
 	// Datastore
-	implementation("androidx.datastore:datastore-preferences:1.2.0")
+	implementation(libs.androidx.datastore.preferences)
 
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)

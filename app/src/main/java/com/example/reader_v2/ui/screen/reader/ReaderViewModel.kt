@@ -30,9 +30,17 @@ data class ReaderUiState(
     val canNavigatePrevious: Boolean = false,
     val isTocVisible: Boolean = false,
     val settings: ReaderSettings = ReaderSettings(),
+    val paginationState: PaginationState = PaginationState(),
     val isSettingsVisible: Boolean = false,
+    val loadLastPage: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
+)
+
+data class PaginationState(
+    val currentPage: Int = 0,
+    val totalPages: Int = 0,
+    val isReady: Boolean = false,
 )
 
 @HiltViewModel
@@ -67,18 +75,6 @@ class ReaderViewModel
                 )
             }
             super.onCleared()
-        }
-
-        fun saveReadingProgress() {
-            val state = uiState.value
-            val book = state.currentBook ?: return
-            viewModelScope.launch(Dispatchers.IO) {
-                repository.updateReadingProgress(
-                    bookId = book.id,
-                    chapterIndex = state.currentChapterIndex,
-                    position = state.currentReadPosition,
-                )
-            }
         }
 
         private fun observeSettings() {
@@ -138,7 +134,14 @@ class ReaderViewModel
                             chapterContent =
                                 ChapterContent(
                                     url = chapterUrl,
-                                    target = if (initialPosition > 0f) ScrollTarget.Position(initialPosition) else ScrollTarget.None,
+                                    target =
+                                        if (initialPosition > 0f) {
+                                            ScrollTarget.Position(
+                                                initialPosition,
+                                            )
+                                        } else {
+                                            ScrollTarget.None
+                                        },
                                 ),
                             currentChapterIndex = chapterIndex,
                             currentReadPosition = initialPosition,
@@ -169,6 +172,13 @@ class ReaderViewModel
             } else {
                 Log.d(TAG, "Already at the last chapter.")
             }
+
+            _uiState.update {
+                it.copy(
+                    // ...
+                    loadLastPage = false,
+                )
+            }
         }
 
         fun navigateToPreviousChapter() {
@@ -176,9 +186,16 @@ class ReaderViewModel
 
             if (currentIndex > 0) {
                 val previousIndex = currentIndex - 1
-                loadChapter(previousIndex)
+                loadChapter(previousIndex, 1.0f)
             } else {
                 Log.d(TAG, "Already at the first chapter.")
+            }
+
+            _uiState.update {
+                it.copy(
+                    // ...
+                    loadLastPage = true,
+                )
             }
         }
 
@@ -216,18 +233,6 @@ class ReaderViewModel
             }
         }
 
-        fun updateReadPosition(position: Float) {
-            lastScrollPosition = position
-
-            scrollJob?.cancel()
-            scrollJob =
-                viewModelScope.launch {
-                    kotlinx.coroutines.delay(200)
-                    _uiState.update { it.copy(currentReadPosition = position) }
-                    saveReadingProgress()
-                }
-        }
-
         fun toggleSettingsVisibility() {
             _uiState.update { it.copy(isSettingsVisible = !it.isSettingsVisible) }
         }
@@ -238,5 +243,24 @@ class ReaderViewModel
             viewModelScope.launch {
                 settingsRepository.updateSettings(newSettings)
             }
+        }
+
+        fun handleJsStateChange(json: String) {
+            val state =
+                com.google.gson
+                    .Gson()
+                    .fromJson(json, PaginationState::class.java)
+            _uiState.update { it.copy(paginationState = state) }
+        }
+
+        fun handleJsEdgeTap(direction: String) {
+            when (direction) {
+                "next" -> navigateToNextChapter()
+                "previous" -> navigateToPreviousChapter()
+            }
+        }
+
+        fun onChapterLoadComplete() {
+            _uiState.update { it.copy(loadLastPage = false) }
         }
     }
