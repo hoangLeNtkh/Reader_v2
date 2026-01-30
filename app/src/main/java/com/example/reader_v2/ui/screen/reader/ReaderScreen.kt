@@ -55,7 +55,10 @@ import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
 
 @SuppressLint("JavascriptInterface")
 @Composable
-fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
+fun ReaderScreen(
+    modifier: Modifier = Modifier,
+    readerViewModel: ReaderViewModel = hiltViewModel(),
+) {
     val uiState by readerViewModel.uiState.collectAsState()
     var showBars by remember { mutableStateOf(false) }
     var isContentReady by remember { mutableStateOf(false) }
@@ -68,7 +71,7 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
         }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         Box(
             modifier =
@@ -182,7 +185,6 @@ fun ReaderScreen(readerViewModel: ReaderViewModel = hiltViewModel()) {
                 )
             }
 
-            // Table of Contents Dropdown
             if (uiState.isTocVisible) {
                 uiState.currentBook?.let { book ->
                     TableOfContentsDropdown(
