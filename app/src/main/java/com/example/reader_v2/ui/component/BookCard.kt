@@ -5,10 +5,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,8 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -58,10 +63,8 @@ fun BookCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
-                .height(180.dp), // Set your desired card height
+                .height(144.dp),
     ) {
-        // 1. The Main Book Card
         Card(
             modifier =
                 Modifier
@@ -77,10 +80,12 @@ fun BookCard(
                         onLongClick = { isMenuVisible = true },
                     ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(8.dp),
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly,
+            Row(
+                modifier = Modifier.fillMaxSize().padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 AsyncImage(
                     model =
@@ -93,15 +98,39 @@ fun BookCard(
                     contentScale = ContentScale.Crop,
                     modifier =
                         Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
+                            .weight(0.3f)
+                            .fillMaxHeight(),
                 )
-                Text(text = book.title, style = MaterialTheme.typography.titleMedium)
-                Text(text = book.author ?: "Unknown Author", style = MaterialTheme.typography.bodySmall)
+
+                Column(
+                    modifier = Modifier.weight(0.7f).fillMaxHeight(),
+                ) {
+                    Text(
+                        text = book.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = book.author ?: "Unknown Author",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+
+	                Spacer(modifier = Modifier.height(8.dp))
+
+	                LinearProgressIndicator(
+						progress = { book.readProgress / 100f },
+		                modifier = Modifier
+			                .fillMaxWidth()
+			                .height(4.dp),
+		                color = MaterialTheme.colorScheme.tertiary,
+		                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+		                strokeCap = StrokeCap.Round
+	                )
+                }
             }
         }
 
-        // 2. The Pop-up Side-Bar
         AnimatedVisibility(
             visible = isMenuVisible,
             enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
@@ -112,9 +141,11 @@ fun BookCard(
                 modifier =
                     Modifier
                         .fillMaxHeight()
+                        .padding(vertical = 8.dp)
+                        .padding(end = 16.dp)
                         .width(60.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f),
-                shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp),
+                shape = RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp, topEnd = 8.dp, bottomEnd = 8.dp),
                 shadowElevation = 8.dp,
             ) {
                 Column(
@@ -122,19 +153,11 @@ fun BookCard(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    // Close button to hide the sidebar
                     IconButton(onClick = { isMenuVisible = false }) {
                         Icon(Icons.Default.Close, contentDescription = "Close")
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Delete button
-                    IconButton(
-                        onClick = {
-                            showDeleteDialog = true
-                        },
-                    ) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
@@ -146,7 +169,6 @@ fun BookCard(
         }
     }
 
-    // 3. The Confirmation Dialog (Remains the same as before)
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
