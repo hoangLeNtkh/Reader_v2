@@ -19,6 +19,46 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "ReaderViewModel"
 
+sealed class ScrollTarget {
+    object None : ScrollTarget()
+
+    data class Anchor(
+        val id: String,
+    ) : ScrollTarget()
+
+    data class Position(
+        val percentage: Float,
+    ) : ScrollTarget()
+}
+
+data class ChapterContent(
+    val url: String,
+    val target: ScrollTarget = ScrollTarget.None,
+)
+
+data class ReaderSettings(
+    val fontSize: Int = 18,
+    val fontFamily: String = "serif",
+    val lineHeight: Float = 1.5f,
+    val theme: ReaderTheme = ReaderTheme.Light,
+    val horizontalMargin: Int = 16,
+)
+
+enum class ReaderTheme(
+    val backgroundColor: String,
+    val textColor: String,
+) {
+    Light("#FFFFFF", "#121212"),
+    Dark("#121212", "#E0E0E0"),
+    Sepia("#F4ECD8", "#5B4636"),
+}
+
+data class PaginationState(
+    val currentPage: Int = 0,
+    val totalPages: Int = 0,
+    val isReady: Boolean = false,
+)
+
 data class ReaderUiState(
     val title: String = "",
     val currentBook: Book? = null,
@@ -37,12 +77,6 @@ data class ReaderUiState(
     val error: String? = null,
 )
 
-data class PaginationState(
-    val currentPage: Int = 0,
-    val totalPages: Int = 0,
-    val isReady: Boolean = false,
-)
-
 @HiltViewModel
 class ReaderViewModel
     @Inject
@@ -53,10 +87,8 @@ class ReaderViewModel
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(ReaderUiState())
         val uiState = _uiState.asStateFlow()
-
         private val bookId: String = checkNotNull(savedStateHandle["bookId"])
-        private var scrollJob: kotlinx.coroutines.Job? = null
-        private var lastScrollPosition: Float = 0f
+        private var currentProgress: Float = 0f
 
         init {
             loadBookContent()
@@ -64,16 +96,7 @@ class ReaderViewModel
         }
 
         override fun onCleared() {
-            val state = uiState.value
-            val book = state.currentBook ?: return
-
-            viewModelScope.launch(Dispatchers.IO + NonCancellable) {
-                repository.updateReadingProgress(
-                    bookId = book.id,
-                    chapterIndex = state.currentChapterIndex,
-                    position = lastScrollPosition,
-                )
-            }
+            saveProgress()
             super.onCleared()
         }
 
@@ -95,6 +118,8 @@ class ReaderViewModel
 
             viewModelScope.launch(Dispatchers.IO) {
                 val book: Book = repository.getBook(bookId)
+
+                currentProgress = book.lastReadPosition
 
                 _uiState.update { state ->
                     state.copy(
@@ -122,12 +147,15 @@ class ReaderViewModel
         ) {
             val book = uiState.value.currentBook ?: return
 
+            saveProgress()
+
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val chapterToLoad: EpubBook.Chapter = book.chapters[chapterIndex]
                     val chapterUrl = repository.getFileUrl(book.id, chapterToLoad.filePath)
+                    currentProgress = initialPosition
 
                     _uiState.update {
                         it.copy(
@@ -245,12 +273,41 @@ class ReaderViewModel
             }
         }
 
+        private fun saveProgress() {
+            val state = uiState.value
+            val book = state.currentBook ?: return
+
+            viewModelScope.launch(Dispatchers.IO + NonCancellable) {
+                repository.updateReadingProgress(
+                    bookId = book.id,
+                    chapterIndex = state.currentChapterIndex,
+                    position = currentProgress,
+                )
+                Log.d(TAG, "Progress saved: Chapter ${state.currentChapterIndex}, Position $currentProgress")
+            }
+        }
+
         fun handleJsStateChange(json: String) {
             val state =
                 com.google.gson
                     .Gson()
                     .fromJson(json, PaginationState::class.java)
-            _uiState.update { it.copy(paginationState = state) }
+
+            if (state.isReady && state != uiState.value.paginationState) {
+                _uiState.update { it.copy(paginationState = state) }
+
+                val newProgress =
+                    if (state.totalPages > 1) {
+                        state.currentPage.toFloat() / (state.totalPages - 1)
+                    } else {
+                        0f
+                    }
+
+                if (newProgress != currentProgress) {
+                    currentProgress = newProgress
+                    saveProgress()
+                }
+            }
         }
 
         fun handleJsEdgeTap(direction: String) {

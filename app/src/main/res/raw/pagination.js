@@ -97,14 +97,14 @@ function setupPagination() {
 function goToPage(pageNumber) {
     if (!isReady) return;
 
-        if (pageNumber < 0) pageNumber = 0;
-        if (pageNumber >= totalPages) pageNumber = totalPages - 1;
+    if (pageNumber < 0) pageNumber = 0;
+    if (pageNumber >= totalPages) pageNumber = totalPages - 1;
 
-        currentPage = pageNumber;
-        const wrapper = document.getElementById('reader-wrapper');
-        const shift = currentPage * window.innerWidth;
-        wrapper.style.transform = `translateX(-${shift}px)`;
-        console.log(`Going to page ${currentPage}. Shift: -${shift}px`);
+    currentPage = pageNumber;
+    const wrapper = document.getElementById('reader-wrapper');
+    const shift = currentPage * window.innerWidth;
+    wrapper.style.transform = `translateX(-${shift}px)`;
+    console.log(`Going to page ${currentPage}. Shift: -${shift}px`);
 }
 
 function goToNextPage() {

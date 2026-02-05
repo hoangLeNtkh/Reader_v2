@@ -29,7 +29,7 @@ interface BookDao {
         bookId: String,
         chapterIndex: Int,
         position: Float,
-        timestamp: Long = System.currentTimeMillis(), // Automatically updates the "Last Read" time
+        timestamp: Long = System.currentTimeMillis(),
     )
 
     @Query("DELETE FROM books WHERE id = :bookId")

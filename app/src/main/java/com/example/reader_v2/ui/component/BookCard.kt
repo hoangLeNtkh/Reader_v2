@@ -116,17 +116,18 @@ fun BookCard(
                         style = MaterialTheme.typography.bodyLarge,
                     )
 
-	                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-	                LinearProgressIndicator(
-						progress = { book.readProgress / 100f },
-		                modifier = Modifier
-			                .fillMaxWidth()
-			                .height(4.dp),
-		                color = MaterialTheme.colorScheme.tertiary,
-		                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-		                strokeCap = StrokeCap.Round
-	                )
+                    LinearProgressIndicator(
+                        progress = { book.readProgress / 100f },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(4.dp),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                        strokeCap = StrokeCap.Round,
+                    )
                 }
             }
         }
