@@ -61,7 +61,7 @@ fun ReaderScreen(
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     var showBars by remember { mutableStateOf(false) }
-    var isContentReady by remember { mutableStateOf(false) }
+    var onContentReady by remember { mutableStateOf(false) }
     val jsInterface =
         remember {
             JavaScriptInterface(
@@ -80,7 +80,7 @@ fun ReaderScreen(
                     .padding(innerPadding),
         ) {
             AndroidView(
-                modifier = Modifier.fillMaxSize().alpha(if (isContentReady) 1f else 0f),
+                modifier = Modifier.fillMaxSize().alpha(if (onContentReady) 1f else 0f),
                 factory = { context ->
                     WebView(context).apply {
                         settings.javaScriptEnabled = true
@@ -98,7 +98,8 @@ fun ReaderScreen(
                                     favicon: android.graphics.Bitmap?,
                                 ) {
                                     super.onPageStarted(view, url, favicon)
-                                    isContentReady = false
+
+                                    onContentReady = false
                                 }
 
                                 override fun onPageFinished(
@@ -106,12 +107,12 @@ fun ReaderScreen(
                                     url: String?,
                                 ) {
                                     super.onPageFinished(view, url)
+
                                     val script =
                                         context.resources
                                             .openRawResource(com.example.reader_v2.R.raw.pagination)
                                             .bufferedReader()
                                             .use { it.readText() }
-
                                     view?.evaluateJavascript(script, null)
 
                                     postDelayed({
@@ -120,8 +121,10 @@ fun ReaderScreen(
                                         val progress = uiState.currentReadPosition
                                         val preferEnd = uiState.loadLastPage
 
-                                        view?.evaluateJavascript("setupAndGoTo($progress, $preferEnd)") {
-                                            isContentReady = true
+                                        view?.evaluateJavascript(
+                                            "setupAndGoTo($progress, $preferEnd)",
+                                        ) {
+                                            onContentReady = true
 
                                             if (preferEnd) {
                                                 readerViewModel.onChapterLoadComplete()
@@ -141,8 +144,16 @@ fun ReaderScreen(
                                         val rightEdge = webViewWidth * 0.75f
 
                                         when {
-                                            e.x > rightEdge -> evaluateJavascript("goToNextPage()", null)
-                                            e.x < leftEdge -> evaluateJavascript("goToPreviousPage()", null)
+                                            e.x > rightEdge ->
+                                                evaluateJavascript(
+                                                    "goToNextPage()",
+                                                    null,
+                                                )
+                                            e.x < leftEdge ->
+                                                evaluateJavascript(
+                                                    "goToPreviousPage()",
+                                                    null,
+                                                )
                                             else -> showBars = !showBars
                                         }
                                         return true
@@ -166,7 +177,7 @@ fun ReaderScreen(
             )
 
             AnimatedVisibility(
-                visible = !isContentReady,
+                visible = !onContentReady,
                 modifier = Modifier.align(Alignment.Center),
             ) {
                 CircularProgressIndicator()
