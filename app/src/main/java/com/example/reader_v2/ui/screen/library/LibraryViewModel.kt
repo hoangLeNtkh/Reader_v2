@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
-import com.example.reader_v2.domain.model.Book
+import com.example.reader_v2.data.entity.Book
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +34,7 @@ class LibraryViewModel
             viewModelScope.launch {
                 _isLoading.value = true
                 try {
-                    val bookId = repository.addAndExtractBook(uri)
+                    val bookId = repository.addBook(uri)
                     println("Successfully added book with ID: $bookId")
                 } catch (e: Exception) {
                     println("Error adding book: ${e.message}")

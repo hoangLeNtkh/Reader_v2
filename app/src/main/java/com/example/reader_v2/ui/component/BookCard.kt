@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.example.reader_v2.domain.model.Book
+import com.example.reader_v2.data.entity.Book
 
 @Composable
 fun BookCard(

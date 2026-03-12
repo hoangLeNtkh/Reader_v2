@@ -30,6 +30,7 @@ android {
 		}
 	}
 	compileOptions {
+		isCoreLibraryDesugaringEnabled = true
 		sourceCompatibility = JavaVersion.VERSION_11
 		targetCompatibility = JavaVersion.VERSION_11
 	}
@@ -51,6 +52,7 @@ dependencies {
 	implementation(libs.androidx.ui.graphics)
 	implementation(libs.androidx.ui.tooling.preview)
 	implementation(libs.androidx.material3)
+	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 	// Room Database
 	implementation(libs.androidx.room.runtime)
@@ -79,6 +81,17 @@ dependencies {
 
 	// Datastore
 	implementation(libs.androidx.datastore.preferences)
+
+	// Readium
+	implementation(libs.readium.shared)
+	implementation(libs.readium.streamer)
+	implementation(libs.readium.navigator)
+	implementation(libs.readium.opds)
+	implementation(libs.readium.lcp)
+	implementation(libs.readium.adapter.pdfium)
+	implementation(libs.readium.adapter.pdfium.document)
+	implementation(libs.readium.adapter.pspdfkit)
+	implementation(libs.readium.adapter.pspdfkit.document)
 
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)

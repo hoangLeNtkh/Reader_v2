@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.reader_v2.data.repository.BookRepository
 import com.example.reader_v2.data.repository.SettingsRepository
 import com.example.reader_v2.domain.epub_parser.epub_model.EpubBook
-import com.example.reader_v2.domain.model.Book
+import com.example.reader_v2.data.entity.Book
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers

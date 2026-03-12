@@ -1,7 +1,7 @@
 package com.example.reader_v2.data.repository
 
 import android.net.Uri
-import com.example.reader_v2.domain.model.Book
+import com.example.reader_v2.data.entity.Book
 import kotlinx.coroutines.flow.Flow
 
 interface BookRepository {
@@ -9,7 +9,7 @@ interface BookRepository {
 
     suspend fun getBook(bookId: String): Book
 
-    suspend fun addAndExtractBook(uri: Uri): String
+    suspend fun addBook(uri: Uri): String?
 
     fun getFileUrl(
         bookId: String,
