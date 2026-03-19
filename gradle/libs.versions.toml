@@ -11,17 +11,15 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.11.0"
 composeBom = "2025.09.00"
+pdfiumandroid = "master-1.9.8-g29ed3f0-1"
 readiumAdapterPdfium = "3.1.2"
-readiumAdapterPdfiumDocument = "3.1.2"
-readiumAdapterPspdfkit = "3.1.2"
-readiumAdapterPspdfkitDocument = "3.1.2"
 readiumLcp = "3.1.2"
 readiumNavigator = "3.1.2"
 readiumOpds = "3.1.2"
 readiumShared = "3.1.2"
 readiumStreamer = "3.1.2"
 roomRuntime = "2.8.0"
-ksp = "2.2.10-2.0.2"
+ksp = "2.2.20-2.0.4"
 hilt = "2.57.1"
 navigationCompose = "2.9.4"
 ksoup = "0.2.5"
@@ -29,6 +27,11 @@ gson = "2.13.2"
 hiltNavigationCompose = "1.3.0"
 kotlinter = "5.2.0"
 webkit = "1.15.0"
+fragmentCompose = "1.8.9"
+appcompat = "1.7.1"
+lifecycleRuntimeKtxVersion = "2.10.0"
+navigationCommonKtx = "2.9.7"
+navigationFragmentKtx = "2.9.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,15 +61,18 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+pdfiumandroid = { module = "com.github.marain87:PdfiumAndroid", version.ref = "pdfiumandroid" }
 readium-adapter-pdfium = { module = "org.readium.kotlin-toolkit:readium-adapter-pdfium", version.ref = "readiumAdapterPdfium" }
-readium-adapter-pdfium-document = { module = "org.readium.kotlin-toolkit:readium-adapter-pdfium-document", version.ref = "readiumAdapterPdfiumDocument" }
-readium-adapter-pspdfkit = { module = "org.readium.kotlin-toolkit:readium-adapter-pspdfkit", version.ref = "readiumAdapterPspdfkit" }
-readium-adapter-pspdfkit-document = { module = "org.readium.kotlin-toolkit:readium-adapter-pspdfkit-document", version.ref = "readiumAdapterPspdfkitDocument" }
 readium-lcp = { module = "org.readium.kotlin-toolkit:readium-lcp", version.ref = "readiumLcp" }
 readium-navigator = { module = "org.readium.kotlin-toolkit:readium-navigator", version.ref = "readiumNavigator" }
 readium-opds = { module = "org.readium.kotlin-toolkit:readium-opds", version.ref = "readiumOpds" }
 readium-shared = { module = "org.readium.kotlin-toolkit:readium-shared", version.ref = "readiumShared" }
 readium-streamer = { module = "org.readium.kotlin-toolkit:readium-streamer", version.ref = "readiumStreamer" }
+androidx-fragment-compose = { group = "androidx.fragment", name = "fragment-compose", version.ref = "fragmentCompose" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

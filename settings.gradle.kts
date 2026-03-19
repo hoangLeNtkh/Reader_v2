@@ -16,9 +16,9 @@ dependencyResolutionManagement {
 	repositories {
 		google()
 		mavenCentral()
+		maven("https://jitpack.io")
 	}
 }
 
 rootProject.name = "Reader-v2"
 include(":app")
- 

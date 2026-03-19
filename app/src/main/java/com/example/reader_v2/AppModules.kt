@@ -8,6 +8,9 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.reader_v2.data.AppDatabase
 import com.example.reader_v2.data.repository.BookRepository
 import com.example.reader_v2.data.repository.BookRepositoryImpl
+import com.example.reader_v2.data.repository.ReaderRepository
+import com.example.reader_v2.data.repository.ReaderRepositoryImpl
+import com.example.reader_v2.data.util.Utility
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -22,7 +25,7 @@ object AppModules {
     @Provides
     @Singleton
     fun provideAppDatabase(
-        @ApplicationContext context: Context,
+        @ApplicationContext context: Context
     ): AppDatabase = AppDatabase.getDatabase(context)
 
     @Provides
@@ -36,17 +39,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBookRepository(bookRepositoryImpl: BookRepositoryImpl): BookRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReaderRepository(readerRepositoryImpl: ReaderRepositoryImpl): ReaderRepository
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DataStoreModule {
-    @Provides
-    @Singleton
-    fun providePreferencesDataStore(
-        @ApplicationContext appContext: Context,
-    ): DataStore<Preferences> =
-        PreferenceDataStoreFactory.create(
-            produceFile = { appContext.preferencesDataStoreFile("settings") },
-        )
-}
+

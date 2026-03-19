@@ -7,15 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.reader_v2.data.dao.BookDao
 import com.example.reader_v2.data.entity.BookEntity
-import com.example.reader_v2.data.util.ChapterListConverter
-import com.example.reader_v2.data.util.TocEntryListConverter
+import com.example.reader_v2.data.util.AuthorListConverters
 
-@Database(
-    entities = [BookEntity::class],
-    version = 1,
-    exportSchema = false,
-)
-@TypeConverters(ChapterListConverter::class, TocEntryListConverter::class)
+@Database(entities = [BookEntity::class], version = 1, exportSchema = false)
+@TypeConverters(AuthorListConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
 
@@ -23,17 +18,14 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase =
-            INSTANCE ?: synchronized(this) {
-                val instance =
-                    Room
-                        .databaseBuilder(
-                            context.applicationContext,
-                            AppDatabase::class.java,
-                            "app_database",
-                        ).build()
-                INSTANCE = instance
-                instance
-            }
+        fun getDatabase(context: Context): AppDatabase = INSTANCE ?: synchronized(this) {
+            val instance = Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                "app_database"
+            ).build()
+            INSTANCE = instance
+            instance
+        }
     }
 }

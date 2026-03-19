@@ -34,8 +34,10 @@ android {
 		sourceCompatibility = JavaVersion.VERSION_11
 		targetCompatibility = JavaVersion.VERSION_11
 	}
-	kotlinOptions {
-		jvmTarget = "11"
+	kotlin {
+		compilerOptions {
+			jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+		}
 	}
 	buildFeatures {
 		compose = true
@@ -52,6 +54,11 @@ dependencies {
 	implementation(libs.androidx.ui.graphics)
 	implementation(libs.androidx.ui.tooling.preview)
 	implementation(libs.androidx.material3)
+	implementation(libs.androidx.fragment.compose)
+	implementation(libs.androidx.appcompat)
+	implementation(libs.lifecycle.runtime.ktx)
+	implementation(libs.androidx.navigation.common.ktx)
+	implementation(libs.androidx.navigation.fragment.ktx)
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 	// Room Database
@@ -89,9 +96,7 @@ dependencies {
 	implementation(libs.readium.opds)
 	implementation(libs.readium.lcp)
 	implementation(libs.readium.adapter.pdfium)
-	implementation(libs.readium.adapter.pdfium.document)
-	implementation(libs.readium.adapter.pspdfkit)
-	implementation(libs.readium.adapter.pspdfkit.document)
+	implementation(libs.pdfiumandroid)
 
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)

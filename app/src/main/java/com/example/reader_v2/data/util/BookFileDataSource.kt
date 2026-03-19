@@ -1,4 +1,4 @@
-package com.example.reader_v2.data.data_source
+package com.example.reader_v2.data.util
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -21,9 +21,6 @@ class BookFileDataSource @Inject constructor(
     private val coversDir = File(context.filesDir, "covers").apply {
         if (!exists()) mkdirs()
     }
-    private val extractedBooksDir = File(context.filesDir, "extracted_books").apply {
-        if (!exists()) mkdirs()
-    }
 
     fun saveBookToAppStorage(uri: Uri, bookId: String): File {
         val bookFile = File(booksDir, "$bookId.epub")
@@ -35,32 +32,20 @@ class BookFileDataSource @Inject constructor(
         return bookFile
     }
 
-    suspend fun saveCoverImage(bookId: String, bitmap: Bitmap?): String? = withContext(Dispatchers.IO) {
-        if (bitmap == null) return@withContext null
+    fun saveCoverImage(bookId: String, bitmap: Bitmap?): String? {
+        if (bitmap == null) return null
         val coverFile = File(coversDir, "$bookId.webp")
         coverFile.outputStream().use { outStream ->
-	        bitmap.compress(Bitmap.CompressFormat.WEBP, 100, outStream)
+            bitmap.compress(Bitmap.CompressFormat.WEBP, 100, outStream)
         }
-        return@withContext coverFile.absolutePath
+
+	    return coverFile.absolutePath
     }
 
-
-    fun getChapterFileUrl(bookId: String, chapterFilePath: String, ): String {
-        val chapterFile = File(getExtractedBookPath(bookId), chapterFilePath)
-        if (!chapterFile.exists()) {
-            throw FileNotFoundException("Chapter file not found: ${chapterFile.absolutePath}")
-        }
-        return "file://${chapterFile.absolutePath}"
+    fun getBookFile(bookId: String): File {
+        return File(booksDir, "$bookId.epub")
     }
-
-    fun getExtractedBookPath(bookId: String): File = File(extractedBooksDir, bookId)
-
     fun deleteBook(bookId: String) {
-        val extractedDir = File(context.filesDir, "extracted_books/$bookId")
-        if (extractedDir.exists()) {
-            extractedDir.deleteRecursively()
-        }
-
         val epubFile = File(context.filesDir, "books/$bookId.epub")
         if (epubFile.exists()) {
             epubFile.delete()

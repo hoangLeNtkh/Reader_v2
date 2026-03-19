@@ -10,9 +10,11 @@ data class BookEntity(
     val id: String,
     val filePath: String,
     val title: String?,
-    val author: List<Contributor>?,
+    val contributors: List<Contributor>?,
     val description: String?,
-    val coverPath: String?,
-    val dateAdded: Long,
+    val coverImagePath: String?,
+    val progression: Float,
+    val lastReadLocation: String?,
+    val addedDate: Long,
     val lastReadDate: Long
 )
