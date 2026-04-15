@@ -7,14 +7,7 @@ import org.readium.r2.shared.publication.Locator
 
 interface BookRepository {
     fun getAllBooks(): Flow<List<Book>>
-
     suspend fun addBook(uri: Uri): Result<String>
-
     suspend fun deleteBook(bookId: String)
-
-    suspend fun updateBook(
-        bookId: String,
-        lastReadLocation: Locator,
-        lastReadDate: Long
-    )
+    fun getReadingProgressionFlow(bookId: String): Flow<Double>
 }

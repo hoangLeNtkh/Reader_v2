@@ -13,7 +13,7 @@ data class BookEntity(
     val contributors: List<Contributor>?,
     val description: String?,
     val coverImagePath: String?,
-    val progression: Float,
+    val progression: Double,
     val lastReadLocation: String?,
     val addedDate: Long,
     val lastReadDate: Long

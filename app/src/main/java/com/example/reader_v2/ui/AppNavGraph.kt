@@ -3,6 +3,7 @@ package com.example.reader_v2.ui
 import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -42,17 +43,18 @@ fun AppNavGraph() {
     ) {
         composable(route = Screen.Library.route) {
             LibraryScreen(
-                openBook = { bookId ->
-                    navController.navigate(Screen.Reader.createRoute(bookId))
-                }
+                openBook = { bookId -> navController.navigate(Screen.Reader.createRoute(bookId)) }
             )
         }
 
-
-        composable(route = Screen.Reader.route) {
+        composable(route = Screen.Reader.route) { navBackStackEntry ->
             val activity = LocalContext.current as ComponentActivity
             val readerViewModel: ReaderViewModel = hiltViewModel(activity)
+            val bookId = navBackStackEntry.arguments?.getString("bookId") ?: ""
 
+            LaunchedEffect(bookId) {
+                readerViewModel.initialize(bookId)
+            }
             ReaderScreen(readerViewModel = readerViewModel)
         }
     }

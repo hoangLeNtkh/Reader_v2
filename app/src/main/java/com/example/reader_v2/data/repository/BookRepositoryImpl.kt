@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import org.readium.adapter.pdfium.document.PdfiumDocumentFactory
 import org.readium.r2.shared.publication.Locator
 import org.readium.r2.shared.publication.services.cover
@@ -31,7 +32,7 @@ class BookRepositoryImpl @Inject constructor(
     private val bookDao: BookDao,
     private val utility: Utility
 ) : BookRepository {
-    override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooks().map { bookList ->
+    override fun getAllBooks(): Flow<List<Book>> = bookDao.getAllBooksFlow().map { bookList ->
 		bookList.map {
 			it.toModel()
 		}
@@ -84,7 +85,7 @@ class BookRepositoryImpl @Inject constructor(
 			    contributors = publication.metadata.authors,
 			    description = publication.metadata.description,
 			    coverImagePath = coverImagePath,
-			    progression = 0f,
+			    progression = 0.0,
 			    lastReadLocation = null,
 			    addedDate = System.currentTimeMillis(),
 			    lastReadDate = System.currentTimeMillis(),
@@ -106,13 +107,8 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-	override suspend fun updateBook(
-		bookId: String,
-		lastReadLocation: Locator,
-		lastReadDate: Long
-	) {
-		TODO("Not yet implemented")
-	}
+	override fun getReadingProgressionFlow(bookId: String): Flow<Double> =
+		bookDao.getReadingProgressionFlow(bookId)
 
 	private fun BookEntity.toModel(): Book = Book(
 		id = id,

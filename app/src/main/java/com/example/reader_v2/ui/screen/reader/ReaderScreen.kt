@@ -9,25 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commitNow
 import androidx.fragment.compose.AndroidFragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.fragment.findNavController
 import com.example.reader_v2.data.repository.ReaderRepository
-import com.example.reader_v2.ui.Screen
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -37,25 +31,23 @@ import org.readium.r2.navigator.epub.EpubNavigatorFragment
 import org.readium.r2.navigator.epub.EpubNavigatorFragment.Listener
 import org.readium.r2.shared.ExperimentalReadiumApi
 import org.readium.r2.shared.util.AbsoluteUrl
-import kotlin.jvm.java
 
 @AndroidEntryPoint
 class ReaderHostFragment : Fragment(), Listener {
 	@Inject
 	lateinit var readerRepository: ReaderRepository
-
 	private val readerViewModel: ReaderViewModel by activityViewModels()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		val epubNavigatorFactory = readerRepository.navigatorFactory
-			?: throw IllegalStateException("Factory not initialized")
+		val navigatorFactory = readerRepository.navigatorFactory ?: throw IllegalStateException("Factory not initialized")
 
-		childFragmentManager.fragmentFactory = epubNavigatorFactory.createFragmentFactory(
-			initialLocator = readerViewModel.initialLocator.value,
-			listener = this
-		)
+		childFragmentManager.fragmentFactory = navigatorFactory
+			.createFragmentFactory(
+				initialLocator = readerViewModel.temporaryLocator,
+				listener = this
+			)
 	}
 
 	override fun onCreateView(
@@ -63,17 +55,19 @@ class ReaderHostFragment : Fragment(), Listener {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		return FragmentContainerView(requireContext()).apply {
+		val context = requireContext()
+
+		return FragmentContainerView(context).apply {
 			id = View.generateViewId()
 		}
 	}
 
+	@OptIn(ExperimentalReadiumApi::class)
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-		readerViewModel.logIdentity("Fragment")
 
 		if (savedInstanceState == null) {
 			childFragmentManager.commitNow {
@@ -85,15 +79,22 @@ class ReaderHostFragment : Fragment(), Listener {
 				)
 			}
 		}
+		readerRepository.navigator = childFragmentManager.findFragmentByTag("navigator") as EpubNavigatorFragment
 
-		val navigatorFragment = childFragmentManager.findFragmentByTag("navigator") as? EpubNavigatorFragment
-		readerRepository.navigator = navigatorFragment
-
+		viewLifecycleOwner.lifecycleScope.launch {
+			viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+				readerRepository.navigator?.currentLocator?.collect {
+					readerViewModel.updateTemporaryLocation(it)
+				}
+			}
+		}
 	}
 
-	override fun onDestroyView() {
-		super.onDestroyView()
-		readerRepository.navigator = null
+	override fun onStop() {
+		super.onStop()
+		viewLifecycleOwner.lifecycleScope.launch {
+			readerViewModel.saveReadingProgression()
+		}
 	}
 
 	@ExperimentalReadiumApi
@@ -107,18 +108,11 @@ fun ReaderScreen(
 	modifier: Modifier = Modifier,
 	readerViewModel: ReaderViewModel
 ) {
-	val isBookReady by readerViewModel.isBookReady.collectAsStateWithLifecycle()
-
-	LaunchedEffect(Unit) {
-		readerViewModel.logIdentity("Compose Screen")
-	}
+	val isBookReady by readerViewModel.isBookLoaded.collectAsStateWithLifecycle()
 
 	Box(modifier = modifier.fillMaxSize()) {
 		if (isBookReady) {
-			AndroidFragment<ReaderHostFragment>(
-				modifier = Modifier.fillMaxSize(),
-				arguments = bundleOf("bookId" to readerViewModel.bookId)
-			)
+			AndroidFragment<ReaderHostFragment>(modifier = Modifier.fillMaxSize())
 		} else {
 			LoadingSpinner()
 		}

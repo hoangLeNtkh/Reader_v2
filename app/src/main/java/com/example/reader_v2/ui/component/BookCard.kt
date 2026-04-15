@@ -32,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,10 +45,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.reader_v2.data.model.Book
+import com.example.reader_v2.ui.screen.library.LibraryViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun BookCard(
@@ -55,9 +60,11 @@ fun BookCard(
     book: Book,
     deleteBook: (String) -> Unit,
     openBook: (String) -> Unit,
+    progressionFlow: Flow<Double>
 ) {
     var isMenuVisible by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val currentProgress by progressionFlow.collectAsState(initial = 0.0) // initial is Double
 
     Box(modifier = modifier.fillMaxWidth().height(144.dp)) {
         Card(
@@ -110,7 +117,7 @@ fun BookCard(
 
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth().height(4.dp),
-                        progress = { 100f },
+                        progress = { currentProgress.toFloat() },
                         color = MaterialTheme.colorScheme.tertiary,
                         trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                         strokeCap = StrokeCap.Round
