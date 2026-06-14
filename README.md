@@ -5,14 +5,7 @@
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-orange.svg)]()
 
 A self-taught, simple Android EPUB reader designed with modern Android development practices using MVVM pattern. It features local library management, local caching for books's covers and images, an UI built entirely with Jetpack Compose and custom EPUB parsing logic (main branch) or integrated EPUB parsing/rendering third-party engine (readium branch).
-
-## 📸 Screenshots
-
-*Insert screenshots or a GIF here to show off the UI!*
-
-| Library View | Reading Interface | Book Details |
-|---|---|---|
-| <img src="link_to_library_image.png" width="250"/> | <img src="link_to_reading_image.png" width="250"/> | <img src="link_to_details_image.png" width="250"/> |
+This is the first ever App that I wrote with only the help of stackoverflow, google, documents. There're many bugs that I yet to understand and resolve.
 
 ## ✨ Key Features
 
@@ -32,17 +25,6 @@ This project is built with basic understanding of scalability and testability in
 * **Asynchronous Programming:** [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) for background threading and I/O management.
 * **Local Storage:** [Room Database](https://developer.android.com/training/data-storage/room)
 * **Core Reading Engine:** Custom parsing logic written by me, or Readium.
-* 
-## 🚀 Getting Started
-
-### Prerequisites
-* Android Studio (Latest recommended)
-* Minimum SDK: 24
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/hoangLeNtkh/your-repo-name.git
 
 ## 🏗 Project Structure
 
