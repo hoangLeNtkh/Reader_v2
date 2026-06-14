@@ -1,48 +1,71 @@
-# 📱 [App Name]
+# 📖 Android EPUB Reader
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg)](https://kotlinlang.org) 
-[![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
-<!-- Add more badges here if you like, e.g., for License, Build Status, etc. -->
+[![Jetpack Compose](https://img.shields.io/badge/Compose-UI-brightgreen.svg)](https://developer.android.com/jetpack/compose)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-orange.svg)]()
 
-A brief, catchy description of your app (1-2 sentences). Explain what problem it solves or what value it provides to the user.
+A self-taught, simple Android EPUB reader designed with modern Android development practices using MVVM pattern. It features local library management, local caching for books's covers and images, an UI built entirely with Jetpack Compose and custom EPUB parsing logic (main branch) or integrated EPUB parsing/rendering third-party engine (readium branch).
 
-## 📸 Screenshots / Demo
+## 📸 Screenshots
 
-*Provide visual proof of your app. Recruiters love this! You can use images or a short GIF.*
+*Insert screenshots or a GIF here to show off the UI!*
 
-| Home Screen | Detail Screen | Settings Screen |
-| :---: | :---: | :---: |
-| <img src="link_to_image_1.png" width="250"/> | <img src="link_to_image_2.png" width="250"/> | <img src="link_to_image_3.png" width="250"/> |
-
-*(Tip: Upload your screenshots to an `assets` folder in your repo, or simply drag and drop them into the GitHub editor to generate links).*
+| Library View | Reading Interface | Book Details |
+|---|---|---|
+| <img src="link_to_library_image.png" width="250"/> | <img src="link_to_reading_image.png" width="250"/> | <img src="link_to_details_image.png" width="250"/> |
 
 ## ✨ Key Features
 
-- **Feature 1:** e.g., Real-time chat using WebSockets.
-- **Feature 2:** e.g., Offline support using Room Database.
-- **Feature 3:** e.g., Clean and intuitive UI built with Jetpack Compose.
-- **Feature 4:** e.g., Dark mode support.
+* **EPUB Support:** Integrated with the **Readium** library alongside custom parsing support for parsing and rendering Epub content to users.
+* **Local Library:** Uses **Room Database** to securely store and index book metadata, genres, and track user reading progress.
+* **Responsive UI:** Heavy file I/O operations and metadata extraction are shifted off the main thread to ensure the app never freezes.
+* **Optimized Image Loading:** Asynchronous cover image processing drastically reduces repeated processing and improves the overall user experience.
 
 ## 🛠 Tech Stack & Architecture
 
-*This is the most important section for technical interviewers. List the modern Android development practices you used.*
+This project is built with basic understanding of scalability and testability in mind, adhering to the **MVVM** design pattern.
 
-- **Language:** [Kotlin](https://kotlinlang.org/)
-- **Architecture:** MVVM (Model-View-ViewModel) / Clean Architecture
-- **UI:** [Jetpack Compose] / [XML Layouts] / Material Design 3
-- **Asynchronous & Reactive:** [Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) & [Flow](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-flow/)
-- **Dependency Injection:** [Dagger Hilt] / [Koin]
-- **Networking:** [Retrofit](https://square.github.io/retrofit/) & [OkHttp](https://square.github.io/okhttp/)
-- **Local Data:** [Room Database] / [DataStore]
-- **Image Loading:** [Coil] / [Glide]
+* **Languages:** [Kotlin](https://kotlinlang.org/), Java
+* **UI Toolkit:** [Jetpack Compose](https://developer.android.com/jetpack/compose) for a declarative, modern UI.
+* **Architecture:** MVVM (Model-View-ViewModel)
+* **Dependency Injection:** [Dagger Hilt](https://dagger.dev/hilt/) for decoupled and testable components.
+* **Asynchronous Programming:** [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) for background threading and I/O management.
+* **Local Storage:** [Room Database](https://developer.android.com/training/data-storage/room)
+* **Core Reading Engine:** Custom parsing logic written by me, or Readium.
+* 
+## 🚀 Getting Started
 
-## 🏗 Project Structure (Optional but recommended)
+### Prerequisites
+* Android Studio (Latest recommended)
+* Minimum SDK: 24
 
-Briefly explain how you organized your code to show that you understand scalable project structures.
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/hoangLeNtkh/your-repo-name.git
+
+## 🏗 Project Structure
+
+The codebase is strictly modularized by layers to enforce MVVM and separation of concerns:
 
 ```text
 app/
-├─ data/        # API interfaces, database entities, repositories implementations
-├─ domain/      # Use cases, models, repository interfaces
-├─ presentation/# ViewModels, UI components (Compose/Fragments)
-└─ di/          # Dependency Injection modules
+├─ data/                  # Data layer implementation
+│  ├─ dao/                # Room Data Access Objects
+│  ├─ data_source/        # Local/Remote data sources
+│  ├─ entity/             # Database entities
+│  ├─ repository/         # Repository implementations
+│  └─ util/               # Data layer utilities
+├─ domain/                # Core business logic and use cases
+│  ├─ epub_parser/        # Custom EPUB parsing logic
+│  │  ├─ epub_model/      # Models specific to EPUB structure
+│  │  └─ util/            # Parsing utilities
+│  └─ model/              # Domain business models
+└─ ui/                    # Presentation layer (Jetpack Compose)
+   ├─ component/          # Reusable Compose UI components
+   ├─ screen/             # App screens and ViewModels
+   │  ├─ library/         # Library management screen
+   │  └─ reader/          # EPUB reading interface
+   └─ theme/              # Material Design theme, typography, and colors
+
+
